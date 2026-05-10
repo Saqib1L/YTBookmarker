@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Bookmark Manager</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <div class="popup-wrapper">
+      <div class="popup" id="popup" data-theme="light">
+
+        <!-- Header Bar -->
+        <div class="header">
+          <div class="search-container">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input type="text" class="search-input" id="search-input" placeholder="Search bookmarks...">
+          </div>
+          <button class="theme-toggle" id="theme-toggle">
+            <!-- Icon swapped by JS -->
+            <svg id="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+            <svg id="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+
+          <!-- Sidebar -->
+          <div class="sidebar">
+            <div class="categories-list" id="categories-list">
+              <button class="category-item active" data-category="All">All</button>
+              <button class="category-item" data-category="Development">Development</button>
+              <button class="category-item" data-category="Fitness">Fitness</button>
+              <button class="category-item" data-category="Music">Music</button>
+              <button class="category-item" data-category="Cooking">Cooking</button>
+              <button class="category-item" data-category="Travel">Travel</button>
+            </div>
+            <div class="new-category-container">
+              <button class="new-category-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                New Category
+              </button>
+            </div>
+          </div>
+
+          <!-- Bookmark Cards -->
+          <div class="bookmarks-container">
+            <div class="bookmarks-list" id="bookmarks-list"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
