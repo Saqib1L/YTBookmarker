@@ -19,8 +19,8 @@ body {
 }
 
 .popup {
-  width: 320px;        
-  height: 480px;     
+  width: 320px;
+  height: 480px;
   display: flex;
   flex-direction: column;
   transition: background-color 0.2s, color 0.2s;
@@ -36,12 +36,11 @@ body {
   color: #ffffff;
 }
 
-/* Header */
 .header {
   display: flex;
   align-items: center;
-  gap: 0.6rem;          
-  padding: 0.8rem;     
+  gap: 0.6rem;
+  padding: 0.8rem;
   border-bottom: 1px solid;
 }
 
@@ -53,7 +52,6 @@ body {
   border-bottom-color: #3a3a3a;
 }
 
-/* Search Container */
 .search-container {
   flex: 1;
   position: relative;
@@ -79,7 +77,7 @@ body {
 }
 
 .search-icon {
-  margin-left: 0.8rem;  
+  margin-left: 0.8rem;
   flex-shrink: 0;
 }
 
@@ -93,8 +91,8 @@ body {
 
 .search-input {
   width: 100%;
-  padding: 0.4rem 0.6rem;   
-  font-size: 0.7rem;          
+  padding: 0.4rem 0.6rem;
+  font-size: 0.7rem;
   background: transparent;
   border: none;
   outline: none;
@@ -102,7 +100,7 @@ body {
 }
 
 .search-input::placeholder {
-  font-size: 0.7rem;          
+  font-size: 0.7rem;
 }
 
 .popup[data-theme="light"] .search-input::placeholder {
@@ -113,11 +111,10 @@ body {
   color: #6b7280;
 }
 
-/* Theme Toggle */
 .theme-toggle {
   flex-shrink: 0;
-  padding: 0.4rem;       
-  border-radius: 0.4rem;     
+  padding: 0.4rem;
+  border-radius: 0.4rem;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -143,14 +140,12 @@ body {
   background-color: #2a2a2a;
 }
 
-/* Main Content */
 .main-content {
   display: flex;
   flex: 1;
   overflow: hidden;
 }
 
-/* Sidebar */
 .sidebar {
   width: 35%;
   display: flex;
@@ -170,19 +165,36 @@ body {
 .categories-list {
   flex: 1;
   overflow-y: auto;
-  padding: 0.6rem 0;   
+  padding: 0.3rem 0;
+}
+
+.category-item-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  padding-right: 0.25rem;
+}
+
+.popup[data-theme="light"] .category-item-wrapper:hover {
+  background-color: #f3f4f6;
+}
+
+.popup[data-theme="dark"] .category-item-wrapper:hover {
+  background-color: #2a2a2a;
 }
 
 .category-item {
-  width: 100%;
-  padding: 0.6rem 0.8rem;    
+  flex: 1;
+  padding: 0.4rem 0.8rem;
   text-align: left;
-  font-size: 0.7rem;         
+  font-size: 0.7rem;
   background: transparent;
   border: none;
   border-left: 2px solid transparent;
   cursor: pointer;
   transition: all 0.2s;
+  color: inherit;
 }
 
 .category-item.active {
@@ -198,17 +210,24 @@ body {
   color: #d1d5db;
 }
 
-.popup[data-theme="light"] .category-item:not(.active):hover {
-  background-color: #f3f4f6;
+.dots-btn {
+  flex-shrink: 0;
+  padding: 0.2rem 0.4rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+  color: inherit;
 }
 
-.popup[data-theme="dark"] .category-item:not(.active):hover {
-  background-color: #2a2a2a;
+.category-item-wrapper:hover .dots-btn {
+  opacity: 1;
 }
 
-/* New Category */
 .new-category-container {
-  padding: 0.6rem 0.8rem;  
+  padding: 0.6rem 0.8rem;
   border-top: 1px solid;
 }
 
@@ -223,8 +242,8 @@ body {
 .new-category-btn {
   display: flex;
   align-items: center;
-  gap: 0.4rem;           
-  font-size: 0.7rem;       
+  gap: 0.4rem;
+  font-size: 0.7rem;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -247,22 +266,20 @@ body {
   color: #d1d5db;
 }
 
-/* Bookmarks Container */
 .bookmarks-container {
   flex: 1;
   overflow-y: auto;
-  padding: 0.6rem;           
+  padding: 0.6rem;
 }
 
 .bookmarks-list {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;          
+  gap: 0.4rem;
 }
 
-/* Bookmark Card */
 .bookmark-card {
-  border-radius: 0.4rem;    
+  border-radius: 0.4rem;
   border: 1px solid;
   transition: background-color 0.2s;
 }
@@ -288,11 +305,11 @@ body {
 
 .bookmark-header {
   width: 100%;
-  padding: 0.5rem 0.6rem;    
+  padding: 0.5rem 0.6rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.4rem;              
+  gap: 0.4rem;
   text-align: left;
   background: transparent;
   border: none;
@@ -301,7 +318,7 @@ body {
 }
 
 .bookmark-title {
-  font-size: 0.7rem;          
+  font-size: 0.7rem;
   font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -318,8 +335,8 @@ body {
 
 .bookmark-icon {
   flex-shrink: 0;
-  width: 0.8rem;             
-  height: 0.8rem;          
+  width: 0.8rem;
+  height: 0.8rem;
 }
 
 .popup[data-theme="light"] .bookmark-icon {
@@ -331,7 +348,7 @@ body {
 }
 
 .bookmark-details {
-  padding: 0 0.6rem 0.6rem;  
+  padding: 0 0.6rem 0.6rem;
   border-top: 1px solid;
   display: none;
 }
@@ -349,21 +366,21 @@ body {
 }
 
 .bookmark-info {
-  padding-top: 0.6rem;       
+  padding-top: 0.6rem;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;                
+  gap: 0.3rem;
 }
 
 .info-label {
-  font-size: 0.6rem;         
+  font-size: 0.6rem;
   color: #6b7280;
 }
 
 .info-text {
-  font-size: 0.6rem;         
-  margin-top: 0.1rem; 
-}       
+  font-size: 0.6rem;
+  margin-top: 0.1rem;
+}
 
 .popup[data-theme="light"] .info-text {
   color: #374151;
@@ -374,11 +391,11 @@ body {
 }
 
 .delete-btn {
-  margin-top: 0.4rem;    
+  margin-top: 0.4rem;
   display: flex;
   align-items: center;
-  gap: 0.3rem;                
-  font-size: 0.6rem;         
+  gap: 0.3rem;
+  font-size: 0.6rem;
   color: #FF0000;
   background: transparent;
   border: none;
@@ -391,15 +408,14 @@ body {
 }
 
 .delete-icon {
-  width: 0.7rem;              
-  height: 0.7rem;             
+  width: 0.7rem;
+  height: 0.7rem;
 }
 
-/* Empty State */
 .empty-state {
   text-align: center;
-  padding: 2.4rem 0;      
-  font-size: 0.7rem;          
+  padding: 2.4rem 0;
+  font-size: 0.7rem;
 }
 
 .popup[data-theme="light"] .empty-state {
@@ -410,10 +426,9 @@ body {
   color: #6b7280;
 }
 
-/* Scrollbar */
 .categories-list::-webkit-scrollbar,
 .bookmarks-container::-webkit-scrollbar {
-  width: 5px;              
+  width: 5px;
 }
 
 .categories-list::-webkit-scrollbar-track,
@@ -431,4 +446,62 @@ body {
 .popup[data-theme="dark"] .bookmarks-container::-webkit-scrollbar-thumb {
   background: #4b5563;
   border-radius: 3px;
+}
+
+.category-input {
+  width: 85%;
+  margin: 0.25rem 0.5rem;
+  padding: 0.25rem 0.375rem;
+  font-size: 0.7rem;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  outline: none;
+  background: transparent;
+  color: inherit;
+}
+
+.context-menu {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  z-index: 100;
+  border-radius: 0.375rem;
+  border: 1px solid;
+  overflow: hidden;
+  min-width: 120px;
+}
+
+.popup[data-theme="light"] .context-menu {
+  background-color: #ffffff;
+  border-color: #e5e7eb;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.popup[data-theme="dark"] .context-menu {
+  background-color: #212121;
+  border-color: #3a3a3a;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.context-menu-item {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-size: 0.7rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+.popup[data-theme="light"] .context-menu-item:hover {
+  background-color: #f3f4f6;
+}
+
+.popup[data-theme="dark"] .context-menu-item:hover {
+  background-color: #2a2a2a;
+}
+
+.context-menu-item.delete {
+  color: #FF0000;
 }
