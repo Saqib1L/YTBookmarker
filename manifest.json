@@ -1,11 +1,11 @@
 {
-  "name": "Hello Extensions of the world",
-  "description": "Base Level Extension",
+  "name": "YouTube Bookmarker",
+  "description": "Youtube Bookmark Extension",
   "version": "1.0",
   "manifest_version": 3,
   "action": {
     "default_popup": "popup.html",
-    "default_icon": "icons/icon.png"
+    "default_icon": "icons/logo.png"
   },
   "permissions": [
     "storage"
