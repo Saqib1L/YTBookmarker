@@ -7,7 +7,7 @@
     "default_popup": "popup.html",
     "default_icon": "icons/icon.png"
   },
-  "permission": [
+  "permissions": [
     "storage"
   ]
 }
