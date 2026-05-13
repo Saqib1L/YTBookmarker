@@ -24,6 +24,7 @@ body {
   display: flex;
   flex-direction: column;
   transition: background-color 0.2s, color 0.2s;
+  position: relative;
 }
 
 .popup[data-theme="light"] {
@@ -147,11 +148,88 @@ body {
 }
 
 .sidebar {
-  width: 35%;
+  width: 40%;
   display: flex;
   flex-direction: column;
   border-right: 1px solid;
   transition: border-color 0.2s;
+}
+
+.delete-confirmation-overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-confirmation-overlay.visible {
+  display: flex;
+}
+
+.delete-confirmation-modal {
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  width: 80%;
+  text-align: center;
+}
+
+.popup[data-theme="light"] .delete-confirmation-modal {
+  background-color: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.popup[data-theme="dark"] .delete-confirmation-modal {
+  background-color: #212121;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.delete-confirmation-message {
+  font-size: 0.75rem;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.delete-confirmation-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.delete-confirmation-confirm,
+.delete-confirmation-cancel {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-confirmation-confirm {
+  background-color: #FF0000;
+  color: #ffffff;
+}
+
+.delete-confirmation-cancel {
+  background-color: #3a3a3a;
+  color: #ffffff;
+}
+
+.delete-confirmation-confirm:hover {
+  background-color: #cc0000;
+}
+
+.delete-confirmation-cancel:hover {
+  background-color: #555555;
 }
 
 .popup[data-theme="light"] .sidebar {
@@ -174,6 +252,8 @@ body {
   justify-content: space-between;
   position: relative;
   padding-right: 0.25rem;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .popup[data-theme="light"] .category-item-wrapper:hover {
@@ -195,6 +275,7 @@ body {
   cursor: pointer;
   transition: all 0.2s;
   color: inherit;
+
 }
 
 .category-item.active {
@@ -458,6 +539,9 @@ body {
   outline: none;
   background: transparent;
   color: inherit;
+  width: calc(100% - 1rem);
+  margin: 0.25rem 0.5rem;
+  box-sizing: border-box;
 }
 
 .category-detail-menu {
