@@ -4,10 +4,18 @@
   "version": "1.0",
   "manifest_version": 3,
   "action": {
-    "default_popup": "popup.html",
+    "default_title": "Open YT Bookmarker",
     "default_icon": "icons/logo.png"
   },
   "permissions": [
-    "storage"
-  ]
+    "storage",
+    "sidePanel",
+    "tabs"
+  ],
+  "side_panel": {
+    "default_path": "popup.html"
+  },
+  "background": {
+    "service_worker": "scripts/background.js"
+  }
 }
