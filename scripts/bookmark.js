@@ -1,5 +1,23 @@
 import { getStorage } from "./storage.js";
 
+function createDetailRow(label, value, addHoverTitle = false) {
+  const row = document.createElement('div');
+  const labelSpan = document.createElement('span');
+  const valueSpan = document.createElement('span');
+
+  labelSpan.className = 'detail-label';
+  valueSpan.className = 'detail-value';
+
+  labelSpan.textContent = label;
+  valueSpan.textContent = value;
+
+  if (addHoverTitle) row.title = value;
+
+  row.appendChild(labelSpan);
+  row.appendChild(valueSpan);
+  return row;
+}
+
 function createBookmarkCard(bookmark) {
   const card = document.createElement('div');
   card.className = 'bookmark-card';
@@ -27,44 +45,37 @@ function createBookmarkCard(bookmark) {
   bookmarkPlayVideoBtn.addEventListener('click', () => {
     chrome.tabs.create({ url: `${bookmark.url}&t=${bookmark.timestamp}` });
   });
-  
+
   const detailsDiv = document.createElement('div');
   detailsDiv.className = 'bookmark-details';
 
-  const youtubeVideoTitle = document.createElement('div');
-  const youtubeChannel = document.createElement('div');
-  const savedDate = document.createElement('div');
-  const category = document.createElement('div');
   const bookmarkDeleteButton = document.createElement('button');
   const bookmarkRenameButton = document.createElement('button');
 
-  youtubeVideoTitle.className = 'youtube-video-title';
-  youtubeChannel.className = 'youtube-channel';
-  savedDate.className = 'saved-Date';
-  category.className = 'category';
   bookmarkDeleteButton.className = 'bookmark-delete-button';
   bookmarkRenameButton.className = 'bookmark-rename-button';
 
-  youtubeVideoTitle.textContent = 'Title: ' + bookmark.youtubeTitle;
-  youtubeChannel.textContent = 'Channel: ' + bookmark.channel;
-  savedDate.textContent = 'Date Saved: ' + bookmark.savedAt;
-  category.textContent = 'Category: ' + bookmark.category;
   bookmarkDeleteButton.textContent = 'Delete';
   bookmarkRenameButton.textContent = 'Rename';
 
-  detailsDiv.appendChild(youtubeVideoTitle);
-  detailsDiv.appendChild(youtubeChannel);
-  detailsDiv.appendChild(savedDate);
-  detailsDiv.appendChild(category);
-  detailsDiv.appendChild(bookmarkDeleteButton);
-  detailsDiv.appendChild(bookmarkRenameButton);
- 
+  const bookmarkActions = document.createElement('div');
+  bookmarkActions.className = 'bookmark-actions';
+  bookmarkActions.appendChild(bookmarkRenameButton);
+  bookmarkActions.appendChild(bookmarkDeleteButton);
+
+  detailsDiv.appendChild(createDetailRow('Title: ', bookmark.youtubeTitle, true));
+  detailsDiv.appendChild(createDetailRow('Channel: ', bookmark.channel));
+  detailsDiv.appendChild(createDetailRow('Saved: ', bookmark.savedAt));
+  detailsDiv.appendChild(createDetailRow('Category: ', bookmark.category));
+  detailsDiv.appendChild(bookmarkActions);
+
   card.appendChild(detailsDiv);
 
   bookmarkDetailMenuBtn.addEventListener('click', () => {
     detailsDiv.classList.toggle('expanded');
     bookmarkDetailMenuBtn.classList.toggle('expanded');
   });
+
   return card;
 }
 
@@ -72,7 +83,7 @@ export function renderBookmarks(bookmarks) {
   const bookmarkList = document.getElementById('bookmarks-list');
   bookmarkList.innerHTML = '';
 
-   bookmarks.forEach((bookmark) => {
+  bookmarks.forEach((bookmark) => {
     const card = createBookmarkCard(bookmark);
     bookmarkList.appendChild(card);
   });
