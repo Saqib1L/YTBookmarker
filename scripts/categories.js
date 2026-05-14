@@ -1,4 +1,5 @@
 import { getStorage, setStorage } from "./storage.js";
+import { renderBookmarks } from "./bookmark.js";
 
 function createCategoryDetailMenu(wrapper, categories) {
   const categoryDetailMenu = document.createElement("div");
@@ -78,6 +79,19 @@ function createCategoryDetailMenu(wrapper, categories) {
 }
 
 
+async function renderAndFilterBookmarks(category) {
+  const result = await getStorage('bookmarks');
+  const bookmarks = result.bookmarks || [];
+
+  if(category === 'All') {
+    renderBookmarks(bookmarks);
+  } else {
+    const filtered = bookmarks.filter((b) => b.category === category);
+    renderBookmarks(filtered);
+  }
+}
+
+
 function createCategoryWrapper(category, categories) {
   const wrapper = document.createElement("div");
   wrapper.className = "category-item-wrapper";
@@ -106,9 +120,16 @@ function createCategoryWrapper(category, categories) {
     wrapper.appendChild(dotsBtn);
   }
 
+  button.addEventListener('click', () => {
+  document.querySelectorAll('.category-item').forEach((btn) => {
+    btn.classList.remove('active');
+  });
+    button.classList.add('active');
+    renderAndFilterBookmarks(category);
+  });
+
   return wrapper;
 }
-
 
 function renderCategories(categories) {
   const list = document.getElementById("categories-list");
@@ -119,7 +140,6 @@ function renderCategories(categories) {
     list.appendChild(wrapper);
   });
 }
-
 
 export async function initCategories() {
   const result = await getStorage("categories");

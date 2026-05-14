@@ -1,4 +1,14 @@
-import { getStorage } from "./storage.js";
+import { getStorage, setStorage } from "./storage.js";
+
+
+export async function searchBookmarks(query) {
+  const result = await getStorage('bookmarks');
+  const bookmarks = result.bookmarks || [];
+  const filtered = bookmarks.filter((b) =>
+    b.customName.toLowerCase().includes(query.toLowerCase())
+  );
+  renderBookmarks(filtered);
+}
 
 function createDetailRow(label, value, addHoverTitle = false) {
   const row = document.createElement('div');
@@ -76,6 +86,62 @@ function createBookmarkCard(bookmark) {
     bookmarkDetailMenuBtn.classList.toggle('expanded');
   });
 
+  //Deleting Bookmarks
+ bookmarkDeleteButton.addEventListener('click', async () => {
+    document.getElementById('delete-confirmation-message').textContent = 
+      `Are you sure you want to delete "${bookmark.customName}"?`;
+
+    const result = await getStorage('bookmarks');
+    const bookmarks = result.bookmarks || [];
+    
+    document.getElementById('delete-confirmation-overlay').classList.add('visible');
+    document.getElementById('delete-confirmation-confirm').addEventListener('click', async () => {
+      const updatedBookmarks = bookmarks.filter((b) => b.id !== bookmark.id);
+     
+      await setStorage({ bookmarks: updatedBookmarks });
+      renderBookmarks(updatedBookmarks);
+      document.getElementById('delete-confirmation-overlay').classList.remove('visible');
+    
+    }, { once: true });
+
+    document.getElementById('delete-confirmation-cancel').addEventListener('click', () => {
+      document.getElementById('delete-confirmation-overlay').classList.remove('visible');
+    }, { once: true });
+  });
+
+
+  //Renaming Bookmarks
+  bookmarkRenameButton.addEventListener('click', () => {
+    const bookmarkRenameSpace = document.createElement('input');
+    bookmarkRenameSpace.value = bookmark.customName;
+    bookmarkRenameSpace.className = 'bookmark-rename-input';
+
+    const oldBookmarkName = bookmark.customName;
+    bookmarkName.replaceWith(bookmarkRenameSpace);
+    bookmarkRenameSpace.select();
+
+    async function saveBookmarkRename() {
+      const result = await getStorage('bookmarks');
+      const bookmarks = result.bookmarks || [];
+
+      const bookmarkSafeName = bookmarkRenameSpace.value.trim().slice(0, 50) || oldBookmarkName;
+      const index = bookmarks.findIndex((b) => b.id === bookmark.id);
+      
+      bookmarks[index].customName = bookmarkSafeName;
+      
+      await setStorage({bookmarks});
+      renderBookmarks(bookmarks)
+    }
+
+    bookmarkRenameSpace.addEventListener('keydown', async (e) => {
+      if (e.key === 'Enter') await saveBookmarkRename();
+    });
+
+    bookmarkRenameSpace.addEventListener('blur', async () => {
+      await saveBookmarkRename();
+    });
+  });
+
   return card;
 }
 
@@ -92,4 +158,8 @@ export function renderBookmarks(bookmarks) {
 export async function initBookmarks() {
   const result = await getStorage('bookmarks');
   renderBookmarks(result.bookmarks || []);
+
+  document.getElementById('search-input').addEventListener('input', (e) => {
+    searchBookmarks(e.target.value);
+  });
 }
