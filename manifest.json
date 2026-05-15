@@ -7,24 +7,20 @@
     "default_title": "Open YT Bookmarker",
     "default_icon": "icons/logo.png"
   },
-  "permissions": ["storage", "sidePanel", "tabs"],
+  "permissions": ["storage", "sidePanel", "tabs", "scripting"],
   "side_panel": {
     "default_path": "popup.html"
   },
   "background": {
     "service_worker": "scripts/background.js"
-  }, 
-  "content_scripts": [
-  {
-    "matches": ["https://www.youtube.com/watch*"],
-    "js": ["scripts/content.js"]
-  }
-], 
-
-"web_accessible_resources": [
+  },
+  "web_accessible_resources": [
     {
       "resources": ["icons/bookmark-icon.png"],
       "matches": ["https://www.youtube.com/*"]
     }
+  ],
+  "host_permissions": [
+    "https://www.youtube.com/*"
   ]
 }
