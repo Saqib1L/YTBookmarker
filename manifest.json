@@ -19,5 +19,12 @@
     "matches": ["https://www.youtube.com/watch*"],
     "js": ["scripts/content.js"]
   }
-] 
+], 
+
+"web_accessible_resources": [
+    {
+      "resources": ["icons/bookmark-icon.png"],
+      "matches": ["https://www.youtube.com/*"]
+    }
+  ]
 }

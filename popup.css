@@ -674,3 +674,42 @@ body {
   color: #d1d5db;
   border-color: #d1d5db;
 }
+
+.bookmark-rename-input {
+  flex: 1;
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #FF0000;
+  outline: none;
+  color: inherit;
+  padding: 0;
+}
+
+.add-bookmark-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  opacity: 0.9;
+  transition: opacity 0.15s ease;
+}
+
+.add-bookmark-button {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+
+  background-color: transparent;
+  border: none;
+
+  cursor: pointer;
+  opacity: 0.9;
+  transition: opacity 0.15s ease;
+}
+
+.add-bookmark-button:hover {
+  opacity: 1;
+}
