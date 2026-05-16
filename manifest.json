@@ -5,8 +5,17 @@
   "manifest_version": 3,
   "action": {
     "default_title": "Open YT Bookmarker",
-    "default_icon": "icons/logo.png"
+      "default_icon": {
+        "16": "icons/logo.png",
+        "48": "icons/logo.png",
+        "128": "icons/logo.png"
+        }
   },
+  "icons": {
+  "16": "icons/logo.png",
+  "48": "icons/logo.png",
+  "128": "icons/logo.png"
+},
   "permissions": ["storage", "sidePanel", "tabs", "scripting"],
   "side_panel": {
     "default_path": "popup.html"
