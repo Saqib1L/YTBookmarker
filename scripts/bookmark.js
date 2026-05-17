@@ -162,4 +162,10 @@ export async function initBookmarks() {
   document.getElementById('search-input').addEventListener('input', (e) => {
     searchBookmarks(e.target.value);
   });
+
+  chrome.storage.onChanged.addListener((changes) => {
+    if (changes.bookmarks) {
+      renderBookmarks(changes.bookmarks.newValue || []);
+    }
+  });
 }
