@@ -598,6 +598,7 @@ body {
   font-size: 0.75rem;
   margin-bottom: 1rem;
   line-height: 1.5;
+  overflow-wrap: break-word;
 }
 
 .delete-confirmation-actions {

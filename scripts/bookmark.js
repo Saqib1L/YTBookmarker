@@ -124,7 +124,7 @@ function createBookmarkCard(bookmark) {
       const result = await getStorage('bookmarks');
       const bookmarks = result.bookmarks || [];
 
-      const bookmarkSafeName = bookmarkRenameSpace.value.trim().slice(0, 50) || oldBookmarkName;
+      const bookmarkSafeName = bookmarkRenameSpace.value.trim().slice(0, 150) || oldBookmarkName;
       const index = bookmarks.findIndex((b) => b.id === bookmark.id);
       
       bookmarks[index].customName = bookmarkSafeName;
