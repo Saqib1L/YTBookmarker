@@ -201,20 +201,6 @@ function createSaveModal(videoData) {
   bookmarkModal.appendChild(categoryWrapper);
   bookmarkModal.appendChild(bookmarkActions);
   document.querySelector(".html5-video-player").appendChild(bookmarkModal);
- 
-  /* document
-    .querySelector(".html5-video-player")
-    .addEventListener("click", function closeOnPlayer(e) {
-      if (
-        !bookmarkModal.contains(e.target) &&
-        !addBookmarkButton.contains(e.target)
-      ) {
-        bookmarkModal.remove();
-        document
-          .querySelector(".html5-video-player")
-          .removeEventListener("click", closeOnPlayer);
-      }
-    }); */
 
   const placeholder = document.createElement("option");
   placeholder.value = "";
@@ -235,6 +221,7 @@ function createSaveModal(videoData) {
   });
 
   bookmarkSaveButton.addEventListener("click", () => {
+    removeCloseModal();
     chrome.storage.local.get("bookmarks", (result) => {
       const bookmarks = result.bookmarks || [];
 
@@ -257,36 +244,27 @@ function createSaveModal(videoData) {
   });
 
   bookmarkCancelButton.addEventListener("click", () => {
+    removeCloseModal();
     bookmarkModal.remove();
   });
 
-  /* setTimeout(() => {
-    document.addEventListener("click", function closeModal(e) {
-      if (
-        !bookmarkModal.contains(e.target) &&
-        !addBookmarkButton.contains(e.target)
-      ) {
-        bookmarkModal.remove();
-        document.removeEventListener("click", closeModal);
-      }
-    });
-  }, 0); */
-
-  setTimeout(() => {
-  document.addEventListener(
-    "click",
+  
     function closeModal(e) {
       if (
         !bookmarkModal.contains(e.target) &&
         !addBookmarkButton.contains(e.target)
       ) {
         e.stopPropagation();
-        e.preventDefault();
         bookmarkModal.remove();
         document.removeEventListener("click", closeModal, true);
         } 
-      },
-     true,
-    );
-  }, 0);
+      }
+
+    function removeCloseModal() {
+      document.removeEventListener("click", closeModal, true);
+    }
+
+    setTimeout(() => {
+      document.addEventListener("click", closeModal, true);
+    }, 0);
 }
