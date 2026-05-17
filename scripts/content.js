@@ -165,7 +165,7 @@ function createSaveModal(videoData) {
   const bookmarkCustomName = document.createElement("input");
   bookmarkCustomName.className = "bookmark-custom-name";
   bookmarkCustomName.value = videoData.videoTitle;
-  ["keydown", "keyup", "keypress"].forEach((eventType) => {
+  ["keydown", "keyup"].forEach((eventType) => {
   bookmarkCustomName.addEventListener(eventType, (e) => {
     e.stopPropagation();
   });
@@ -200,9 +200,9 @@ function createSaveModal(videoData) {
   bookmarkModal.appendChild(categoryLabel);
   bookmarkModal.appendChild(categoryWrapper);
   bookmarkModal.appendChild(bookmarkActions);
-
   document.querySelector(".html5-video-player").appendChild(bookmarkModal);
-  document
+ 
+  /* document
     .querySelector(".html5-video-player")
     .addEventListener("click", function closeOnPlayer(e) {
       if (
@@ -214,7 +214,7 @@ function createSaveModal(videoData) {
           .querySelector(".html5-video-player")
           .removeEventListener("click", closeOnPlayer);
       }
-    });
+    }); */
 
   const placeholder = document.createElement("option");
   placeholder.value = "";
@@ -260,7 +260,7 @@ function createSaveModal(videoData) {
     bookmarkModal.remove();
   });
 
-  setTimeout(() => {
+  /* setTimeout(() => {
     document.addEventListener("click", function closeModal(e) {
       if (
         !bookmarkModal.contains(e.target) &&
@@ -270,5 +270,23 @@ function createSaveModal(videoData) {
         document.removeEventListener("click", closeModal);
       }
     });
+  }, 0); */
+
+  setTimeout(() => {
+  document.addEventListener(
+    "click",
+    function closeModal(e) {
+      if (
+        !bookmarkModal.contains(e.target) &&
+        !addBookmarkButton.contains(e.target)
+      ) {
+        e.stopPropagation();
+        e.preventDefault();
+        bookmarkModal.remove();
+        document.removeEventListener("click", closeModal, true);
+        } 
+      },
+     true,
+    );
   }, 0);
 }
