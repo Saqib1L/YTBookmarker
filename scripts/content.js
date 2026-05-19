@@ -1,3 +1,5 @@
+function init() {
+
 const style = document.createElement("style");
 style.textContent = `
   .yt-bookmarker-modal {
@@ -136,23 +138,24 @@ function injectButton() {
 
 const addBookmarkButton = injectButton();
 
-addBookmarkButton.addEventListener("click", () => {
-  if (document.querySelector(".yt-bookmarker-modal")) {
-    document.querySelector(".yt-bookmarker-modal").remove();
-    return;
-  }
+if(addBookmarkButton) {
+  addBookmarkButton.addEventListener("click", () => {
+    if (document.querySelector(".yt-bookmarker-modal")) {
+      document.querySelector(".yt-bookmarker-modal").remove();
+      return;
+    }
 
-  const videoData = {
-    videoTitle: document.querySelector(
-      "h1.ytd-watch-metadata yt-formatted-string",
-    )?.textContent,
-    channelName: document.querySelector("#channel-name a")?.textContent,
-    videoUrl: window.location.href.split("&")[0],
-    timestamp: Math.floor(document.querySelector("video")?.currentTime || 0),
-  };
-
-  createSaveModal(videoData);
-});
+    const videoData = {
+      videoTitle: document.querySelector(
+        "h1.ytd-watch-metadata yt-formatted-string",
+      )?.textContent,
+      channelName: document.querySelector("#channel-name a")?.textContent,
+      videoUrl: window.location.href.split("&")[0],
+      timestamp: Math.floor(document.querySelector("video")?.currentTime || 0),
+    };
+    createSaveModal(videoData);
+  });
+}
 
 function createSaveModal(videoData) {
   const bookmarkModal = document.createElement("div");
@@ -233,7 +236,7 @@ function createSaveModal(videoData) {
         url: videoData.videoUrl,
         timestamp: videoData.timestamp,
         category: bookmarkCategory.value,
-        savedAt: new Date().toLocaleDateString(),
+        savedAt: new Date().toLocaleDateString('en-GB'),
       };
 
       bookmarks.push(newBookmark);
@@ -267,4 +270,10 @@ function createSaveModal(videoData) {
     setTimeout(() => {
       document.addEventListener("click", closeModal, true);
     }, 0);
+} 
+}
+
+if (!window.__ytBookmarkerLoaded) {
+  window.__ytBookmarkerLoaded = true;
+  init();
 }

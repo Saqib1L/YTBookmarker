@@ -16,7 +16,7 @@
   "48": "icons/logo.png",
   "128": "icons/logo.png"
 },
-  "permissions": ["storage", "sidePanel", "tabs", "scripting"],
+  "permissions": ["storage", "sidePanel", "tabs", "scripting", "webNavigation"],
   "side_panel": {
     "default_path": "popup.html"
   },
