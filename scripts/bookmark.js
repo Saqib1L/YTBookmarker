@@ -141,7 +141,7 @@ function createBookmarkCard(bookmark) {
       await saveBookmarkRename();
     });
   });
-
+  
   return card;
 }
 
