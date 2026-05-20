@@ -1,5 +1,5 @@
 import { getStorage, setStorage } from "./storage.js";
-
+import { getActiveCategory } from "./state.js";
 
 export async function searchBookmarks(query) {
   const result = await getStorage('bookmarks');
@@ -99,9 +99,12 @@ function createBookmarkCard(bookmark) {
       const updatedBookmarks = bookmarks.filter((b) => b.id !== bookmark.id);
      
       await setStorage({ bookmarks: updatedBookmarks });
-      renderBookmarks(updatedBookmarks);
+
+      const category = getActiveCategory();
+      const filtered = category === 'All' ? updatedBookmarks : updatedBookmarks.filter((b) => b.category === category);
+      renderBookmarks(filtered);
+
       document.getElementById('delete-confirmation-overlay').classList.remove('visible');
-    
     }, { once: true });
 
     document.getElementById('delete-confirmation-cancel').addEventListener('click', () => {
@@ -130,7 +133,7 @@ function createBookmarkCard(bookmark) {
       bookmarks[index].customName = bookmarkSafeName;
       
       await setStorage({bookmarks});
-      renderBookmarks(bookmarks)
+      renderBookmarks(bookmarks);
     }
 
     bookmarkRenameSpace.addEventListener('keydown', async (e) => {
@@ -165,7 +168,10 @@ export async function initBookmarks() {
 
   chrome.storage.onChanged.addListener((changes) => {
     if (changes.bookmarks) {
-      renderBookmarks(changes.bookmarks.newValue || []);
+      const bookmarks = changes.bookmarks.newValue || [];
+      const category = getActiveCategory();
+      const filtered = category === 'All' ? bookmarks : bookmarks.filter((b) => b.category === category);
+      renderBookmarks(filtered);
     }
   });
 }

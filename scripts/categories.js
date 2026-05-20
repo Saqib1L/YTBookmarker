@@ -1,5 +1,6 @@
 import { getStorage, setStorage } from "./storage.js";
 import { renderBookmarks } from "./bookmark.js";
+import { getActiveCategory, setActiveCategory } from "./state.js";
 
 function createCategoryDetailMenu(wrapper, categories) {
   const categoryDetailMenu = document.createElement("div");
@@ -125,6 +126,7 @@ function createCategoryWrapper(category, categories) {
     btn.classList.remove('active');
   });
     button.classList.add('active');
+    setActiveCategory(category);
     renderAndFilterBookmarks(category);
   });
 
