@@ -3,11 +3,13 @@ import { getActiveCategory } from "./state.js";
 
 export async function searchBookmarks(query) {
   const result = await getStorage('bookmarks');
+  
+  const category = getActiveCategory();
   const bookmarks = result.bookmarks || [];
-  const filtered = bookmarks.filter((b) =>
-    b.customName.toLowerCase().includes(query.toLowerCase())
-  );
-  renderBookmarks(filtered);
+
+  const filteredBookmarks = category === 'All' ? bookmarks : bookmarks.filter((b) => b.category === category);
+  const filteredFromSearch = filteredBookmarks.filter((b) => b.customName.toLowerCase().includes(query.toLowerCase()));
+  renderBookmarks(filteredFromSearch);
 }
 
 function createDetailRow(label, value, addHoverTitle = false) {
