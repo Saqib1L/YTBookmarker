@@ -95,9 +95,9 @@ function createBookmarkCard(bookmark) {
 
     const result = await getStorage('bookmarks');
     const bookmarks = result.bookmarks || [];
-    
     document.getElementById('delete-confirmation-overlay').classList.add('visible');
-    document.getElementById('delete-confirmation-confirm').addEventListener('click', async () => {
+
+    async function onConfirm() {
       const updatedBookmarks = bookmarks.filter((b) => b.id !== bookmark.id);
      
       await setStorage({ bookmarks: updatedBookmarks });
@@ -107,11 +107,20 @@ function createBookmarkCard(bookmark) {
       renderBookmarks(filtered);
 
       document.getElementById('delete-confirmation-overlay').classList.remove('visible');
-    }, { once: true });
+    }
 
-    document.getElementById('delete-confirmation-cancel').addEventListener('click', () => {
-      document.getElementById('delete-confirmation-overlay').classList.remove('visible');
-    }, { once: true });
+    function onCancel() {
+       document.getElementById('delete-confirmation-overlay').classList.remove('visible');
+    }
+
+    const confirmBtn = document.getElementById('delete-confirmation-confirm');
+    const cancelBtn = document.getElementById('delete-confirmation-cancel');
+
+    confirmBtn.removeEventListener('click', onConfirm);
+    confirmBtn.addEventListener('click', onConfirm, { once: true });
+
+    cancelBtn.removeEventListener('click', onCancel);
+    cancelBtn.addEventListener('click', onCancel, { once: true });
   });
 
 
