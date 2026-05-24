@@ -17,15 +17,21 @@ function createCategoryDetailMenu(wrapper, categories) {
   categoryDetailMenu.appendChild(categoryRenameButton);
   categoryDetailMenu.appendChild(categoryDeleteButton);
 
-  document.addEventListener("click", (e) => {
+  function onOutsideClick(e) {
     if (!wrapper.contains(e.target)) {
       categoryDetailMenu.remove();
+      wrapper.classList.remove('menu-open')
+      document.removeEventListener('click', onOutsideClick);
     }
-  });
+  }
+
+  document.removeEventListener('click', onOutsideClick);
+  document.addEventListener('click', onOutsideClick);
 
   //handle renaming
   const categoryButton = wrapper.querySelector(".category-item");
   categoryRenameButton.addEventListener("click", () => {
+    document.removeEventListener('click', onOutsideClick)
 
     const renameSpace = document.createElement("input");
     renameSpace.value = categoryButton.textContent;
@@ -44,6 +50,7 @@ function createCategoryDetailMenu(wrapper, categories) {
   }
 
     categoryDetailMenu.remove();
+    wrapper.classList.remove('menu-open');
 
     renameSpace.addEventListener("keydown", async (e) => {
       if (e.key === "Enter") {
@@ -56,25 +63,37 @@ function createCategoryDetailMenu(wrapper, categories) {
     });
   });
 
-
   //handle deleting
   categoryDeleteButton.addEventListener('click', async () => {
+    document.removeEventListener('click', onOutsideClick)
+
+    categoryDetailMenu.remove();
+    wrapper.classList.remove('menu-open');
+    
+
     const nameToDelete = categoryButton.getAttribute('data-category');
     document.getElementById('delete-confirmation-message').textContent = `Are you sure you want to delete the category "${nameToDelete}"?`;
-
     document.getElementById('delete-confirmation-overlay').classList.add('visible');
 
-    document.getElementById('delete-confirmation-confirm').addEventListener('click', async () => {
+    async function onConfirm() {
       const updatedCategories = categories.filter((cat) => cat !== nameToDelete);
       await setStorage({ categories: updatedCategories });
       renderCategories(updatedCategories);
-
       document.getElementById('delete-confirmation-overlay').classList.remove('visible');
-    }, {once: true});
+    }
 
-    document.getElementById('delete-confirmation-cancel').addEventListener('click', () => {
-       document.getElementById('delete-confirmation-overlay').classList.remove('visible');
-    }, {once: true});
+    function onCancel() {
+      document.getElementById('delete-confirmation-overlay').classList.remove('visible');
+    }
+
+    const confirmBtn = document.getElementById('delete-confirmation-confirm');
+    const cancelBtn =  document.getElementById('delete-confirmation-cancel');
+
+    confirmBtn.removeEventListener('click', onConfirm);
+    confirmBtn.addEventListener('click', onConfirm, {once: true});
+
+    cancelBtn.removeEventListener('click', onCancel);
+    cancelBtn.addEventListener('click', onCancel, {once: true});
   });
   return categoryDetailMenu;
 }
@@ -114,6 +133,11 @@ function createCategoryWrapper(category, categories) {
     dotsBtn.textContent = "⋮";
 
     dotsBtn.addEventListener("click", () => {
+      const existingMenu = document.querySelector('.category-detail-menu');
+      if (existingMenu) existingMenu.remove();
+
+      wrapper.classList.add('menu-open');
+
       const menu = createCategoryDetailMenu(wrapper, categories);
       wrapper.appendChild(menu);
     });
