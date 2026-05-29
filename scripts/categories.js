@@ -45,7 +45,12 @@ function createCategoryDetailMenu(wrapper, categories) {
     const safeName = renameSpace.value.trim().slice(0, 50) || oldName;
     const index = categories.indexOf(oldName);
     categories[index] = safeName;
-    await setStorage({ categories });
+
+    const result = await getStorage('bookmarks');
+    const bookmarks = result.bookmarks || [];
+
+    const updatedBookmarks = bookmarks.map((b) => b.category === oldName ? { ...b, category: safeName } : b );
+    await setStorage({ categories, bookmarks: updatedBookmarks });
     renderCategories(categories);
   }
 

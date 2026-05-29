@@ -206,6 +206,7 @@ function init() {
     document.querySelector(".html5-video-player").appendChild(bookmarkModal);
 
     function populateCategories() {
+      if (!chrome.runtime?.id) return;
       chrome.storage.local.get("categories", (result) => {
         const selected = bookmarkCategory.value;
         bookmarkCategory.innerHTML = '';
@@ -228,8 +229,10 @@ function init() {
         });
       });
     }
-
-    chrome.storage.onChanged.addListener(onStorageChanged);
+    
+    if (chrome.runtime?.id) {
+      chrome.storage.onChanged.addListener(onStorageChanged); 
+    }
     populateCategories();
 
     function onStorageChanged(changes) {
