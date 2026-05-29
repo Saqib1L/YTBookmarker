@@ -123,6 +123,18 @@ function createBookmarkCard(bookmark) {
     cancelBtn.addEventListener('click', onCancel, { once: true });
   });
 
+  async function saveBookmarkRename(input, bookmarkId, oldName) {
+    const result = await getStorage('bookmarks');
+    const bookmarks = result.bookmarks || [];
+
+    const bookmarkSafeName = input.value.trim().slice(0, 150) || oldName;
+    const index = bookmarks.findIndex((b) => b.id === bookmarkId);
+    
+    bookmarks[index].customName = bookmarkSafeName;
+    
+    await setStorage({ bookmarks });
+    renderBookmarks(bookmarks);
+  }
 
   //Renaming Bookmarks
   bookmarkRenameButton.addEventListener('click', () => {
@@ -134,28 +146,14 @@ function createBookmarkCard(bookmark) {
     bookmarkName.replaceWith(bookmarkRenameSpace);
     bookmarkRenameSpace.select();
 
-    async function saveBookmarkRename() {
-      const result = await getStorage('bookmarks');
-      const bookmarks = result.bookmarks || [];
-
-      const bookmarkSafeName = bookmarkRenameSpace.value.trim().slice(0, 150) || oldBookmarkName;
-      const index = bookmarks.findIndex((b) => b.id === bookmark.id);
-      
-      bookmarks[index].customName = bookmarkSafeName;
-      
-      await setStorage({bookmarks});
-      renderBookmarks(bookmarks);
-    }
-
     bookmarkRenameSpace.addEventListener('keydown', async (e) => {
-      if (e.key === 'Enter') await saveBookmarkRename();
+      if (e.key === 'Enter') await saveBookmarkRename(bookmarkRenameSpace, bookmark.id, oldBookmarkName);
     });
 
     bookmarkRenameSpace.addEventListener('blur', async () => {
-      await saveBookmarkRename();
+      await saveBookmarkRename(bookmarkRenameSpace, bookmark.id, oldBookmarkName);
     });
-  });
-  
+  });  
   return card;
 }
 
