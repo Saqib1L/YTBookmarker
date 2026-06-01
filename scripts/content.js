@@ -298,7 +298,14 @@ function init() {
           url: videoData.videoUrl,
           timestamp: videoData.timestamp,
           category: bookmarkCategory.value,
-          savedAt: new Date().toLocaleDateString('en-GB'),
+          savedAt: new Date().toLocaleString('en-GB', { 
+            day: '2-digit', 
+            month: '2-digit', 
+            year: 'numeric',
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: true 
+          }).replace(/am|pm/i, (match) => match.toUpperCase()),
         };
 
         bookmarks.push(newBookmark);
