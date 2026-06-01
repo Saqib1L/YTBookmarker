@@ -2,6 +2,27 @@ function init() {
 
   const style = document.createElement("style");
   style.textContent = `
+    .yt-bookmarker-tooltip {
+      position: absolute;
+      background: rgba(28, 28, 28, 0.4);
+      color: #ffffff;
+      font-family: 'Roboto', 'Arial', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 5px 9px;
+      border-radius: 8px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.1s ease;
+      white-space: nowrap;
+      z-index: 9999;
+      letter-spacing: 0.5px;
+    }
+
+    .yt-bookmarker-tooltip.visible {
+      opacity: 1;
+    }
+
     .yt-bookmarker-modal {
       position: absolute;
       bottom: 60px;
@@ -67,6 +88,7 @@ function init() {
       font-size: 13px;
       outline: none;
       cursor: pointer;
+      overflow-y: auto;
     }
 
     .bookmark-category option {
@@ -126,7 +148,6 @@ function init() {
 
     const addBookmarkButton = document.createElement("button");
     addBookmarkButton.className = "ytp-button add-bookmark-button";
-    addBookmarkButton.title = "Add Bookmark";
     addBookmarkButton.style.backgroundImage = `url(${chrome.runtime.getURL("icons/bookmark-icon.png")})`;
     addBookmarkButton.style.backgroundSize = "24px";
     addBookmarkButton.style.backgroundPosition = "center";
@@ -135,10 +156,30 @@ function init() {
     rightControls.prepend(addBookmarkButton);
     return addBookmarkButton;
   }
-
+  
   const addBookmarkButton = injectButton();
 
+  const tooltip = document.createElement('div');
+  tooltip.className = 'yt-bookmarker-tooltip';
+  tooltip.textContent = 'Add Bookmark';
+  document.querySelector('.html5-video-player').appendChild(tooltip);
+
   if(addBookmarkButton) {
+
+    addBookmarkButton.addEventListener('mouseenter', () => {
+      const btnRect = addBookmarkButton.getBoundingClientRect();
+      const playerRect = document.querySelector('.html5-video-player').getBoundingClientRect();
+      
+      tooltip.style.left = `${btnRect.left - playerRect.left + (btnRect.width / 2)}px`;
+      tooltip.style.top = `${btnRect.top - playerRect.top - 48}px`;
+      tooltip.style.transform = 'translateX(-50%)';
+      tooltip.classList.add('visible');
+    });
+
+    addBookmarkButton.addEventListener('mouseleave', () => {
+      tooltip.classList.remove('visible');
+    });
+
     addBookmarkButton.addEventListener("click", () => {
       if (document.querySelector(".yt-bookmarker-modal")) {
         document.querySelector(".yt-bookmarker-modal").remove();

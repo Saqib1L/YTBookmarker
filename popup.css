@@ -208,6 +208,7 @@ body {
   padding-right: 0.25rem;
   white-space: normal;
   word-break: break-word;
+  transition: background-color 0.25s ease;
 }
 
 .popup[data-theme="light"] .category-item-wrapper:hover:not(.menu-open) {
@@ -223,11 +224,12 @@ body {
   padding: 0.4rem 0.8rem;
   text-align: left;
   font-size: 0.7rem;
+  font-weight: 600;
   background: transparent;
   border: none;
   border-left: 2px solid transparent;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: border-left-color 0.15s ease, color 0.15s ease;
   color: inherit;
 }
 
@@ -309,6 +311,7 @@ body {
   border: none;
   cursor: pointer;
   color: inherit;
+  transition: background-color 0.15s ease;
 }
 
 .popup[data-theme="light"] .category-menu-rename-button:hover,
@@ -543,6 +546,21 @@ body {
 .popup[data-theme="dark"] .bookmark-rename-button {
   color: #d1d5db;
   border-color: #d1d5db;
+}
+
+.bookmark-delete-button:hover {
+  background-color: rgba(255, 0, 0, 0.1);
+  transition: background-color 0.15s ease;
+}
+
+.popup[data-theme="light"] .bookmark-rename-button:hover {
+  background-color: rgba(55, 65, 81, 0.1);
+  transition: background-color 0.15s ease;
+}
+
+.popup[data-theme="dark"] .bookmark-rename-button:hover {
+  background-color: rgba(209, 213, 219, 0.1);
+  transition: background-color 0.15s ease;
 }
 
 .bookmark-rename-input {
