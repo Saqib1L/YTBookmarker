@@ -34,6 +34,14 @@ function createDetailRow(label, value, addHoverTitle = false) {
   return row;
 }
 
+function formatTimestamp(seconds) {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
+
 function createBookmarkCard(bookmark) {
   // --- Build card UI ---
   const card = document.createElement('div');
@@ -84,6 +92,7 @@ function createBookmarkCard(bookmark) {
 
   detailsDiv.appendChild(createDetailRow('Title: ', bookmark.youtubeTitle, true));
   detailsDiv.appendChild(createDetailRow('Channel: ', bookmark.channel));
+  detailsDiv.appendChild(createDetailRow('Timestamp: ', formatTimestamp(bookmark.timestamp)));
   detailsDiv.appendChild(createDetailRow('Saved: ', bookmark.savedAt));
   detailsDiv.appendChild(createDetailRow('Category: ', bookmark.category));
   detailsDiv.appendChild(bookmarkActions);

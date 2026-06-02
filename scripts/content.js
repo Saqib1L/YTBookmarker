@@ -1,5 +1,7 @@
-function init() {
+const getStorage = (key) => new Promise((resolve) => chrome.storage.local.get(key, resolve));
+const setStorage = (data) => new Promise((resolve) => chrome.storage.local.set(data, resolve));
 
+function injectStyles() {
   const style = document.createElement("style");
   style.textContent = `
     .yt-bookmarker-tooltip {
@@ -139,7 +141,35 @@ function init() {
   `;
 
   document.head.appendChild(style);
+}
 
+function setupTooltip(addBookmarkButton) {
+  const tooltip = document.createElement('div');
+  tooltip.className = 'yt-bookmarker-tooltip';
+  tooltip.textContent = 'Add Bookmark';
+  document.querySelector('.html5-video-player').appendChild(tooltip);
+
+  addBookmarkButton.addEventListener('mouseenter', () => {
+    const btnRect = addBookmarkButton.getBoundingClientRect();
+    const playerRect = document.querySelector('.html5-video-player').getBoundingClientRect();
+    tooltip.style.left = `${btnRect.left - playerRect.left + (btnRect.width / 2)}px`;
+    tooltip.style.top = `${btnRect.top - playerRect.top - 48}px`;
+    tooltip.style.transform = 'translateX(-50%)';
+    tooltip.classList.add('visible');
+  });
+
+  addBookmarkButton.addEventListener('mouseleave', () => {
+    tooltip.classList.remove('visible');
+  });
+}
+
+function init() {
+
+  // --- Inject styles ---
+  injectStyles();
+
+
+  // --- Inject bookmark button ---
   function injectButton() {
     if (document.querySelector(".add-bookmark-button")) return;
 
@@ -159,27 +189,10 @@ function init() {
   
   const addBookmarkButton = injectButton();
 
-  const tooltip = document.createElement('div');
-  tooltip.className = 'yt-bookmarker-tooltip';
-  tooltip.textContent = 'Add Bookmark';
-  document.querySelector('.html5-video-player').appendChild(tooltip);
 
+  // --- Setup tooltip and button interactions ---
   if(addBookmarkButton) {
-
-    addBookmarkButton.addEventListener('mouseenter', () => {
-      const btnRect = addBookmarkButton.getBoundingClientRect();
-      const playerRect = document.querySelector('.html5-video-player').getBoundingClientRect();
-      
-      tooltip.style.left = `${btnRect.left - playerRect.left + (btnRect.width / 2)}px`;
-      tooltip.style.top = `${btnRect.top - playerRect.top - 48}px`;
-      tooltip.style.transform = 'translateX(-50%)';
-      tooltip.classList.add('visible');
-    });
-
-    addBookmarkButton.addEventListener('mouseleave', () => {
-      tooltip.classList.remove('visible');
-    });
-
+    setupTooltip(addBookmarkButton);
     addBookmarkButton.addEventListener("click", () => {
       if (document.querySelector(".yt-bookmarker-modal")) {
         document.querySelector(".yt-bookmarker-modal").remove();
@@ -187,10 +200,8 @@ function init() {
       }
 
       const videoData = {
-        videoTitle: document.querySelector(
-          "h1.ytd-watch-metadata yt-formatted-string",
-        )?.textContent,
-        channelName: document.querySelector("#channel-name a")?.textContent,
+        videoTitle: document.querySelector("h1.ytd-watch-metadata yt-formatted-string")?.textContent || "Untitled Video",
+        channelName: document.querySelector("#channel-name a")?.textContent || "Unknown Channel",
         videoUrl: window.location.href.split("&")[0],
         timestamp: Math.floor(document.querySelector("video")?.currentTime || 0),
       };
@@ -199,6 +210,8 @@ function init() {
   }
 
   function createSaveModal(videoData) {
+      
+      // --- Build modal UI ---
       const bookmarkModal = document.createElement("div");
       bookmarkModal.className = "yt-bookmarker-modal";
 
@@ -246,6 +259,8 @@ function init() {
     bookmarkModal.appendChild(bookmarkActions);
     document.querySelector(".html5-video-player").appendChild(bookmarkModal);
 
+
+    // --- Category population ---
     function populateCategories() {
       if (!chrome.runtime?.id) return;
       chrome.storage.local.get("categories", (result) => {
@@ -271,6 +286,8 @@ function init() {
       });
     }
     
+
+    // --- Storage change listener ---
     if (chrome.runtime?.id) {
       chrome.storage.onChanged.addListener(onStorageChanged); 
     }
@@ -285,12 +302,14 @@ function init() {
       chrome.storage.onChanged.removeListener(onStorageChanged);
     }
 
-    bookmarkSaveButton.addEventListener("click", () => {
-      removeCloseModal();
-      chrome.storage.local.get("bookmarks", (result) => {
-        const bookmarks = result.bookmarks || [];
 
-        const newBookmark = {
+    // --- Save flow ---
+    bookmarkSaveButton.addEventListener("click", async () => {
+      removeCloseModal();
+      const result = await getStorage("bookmarks");
+      const bookmarks = result.bookmarks || [];
+
+      const newBookmark = {
           id: Date.now().toString(),
           customName: bookmarkCustomName.value.trim() || videoData.videoTitle,
           youtubeTitle: videoData.videoTitle,
@@ -308,30 +327,32 @@ function init() {
           }).replace(/am|pm/i, (match) => match.toUpperCase()),
         };
 
-        bookmarks.push(newBookmark);
-        chrome.storage.local.set({ bookmarks }, () => {
-          bookmarkModal.remove();
-        });
-      });
+      bookmarks.push(newBookmark);
+      await setStorage({ bookmarks });
+      bookmarkModal.remove();
     });
 
+
+    // --- Cancel flow ---
     bookmarkCancelButton.addEventListener("click", () => {
       removeCloseModal();
       bookmarkModal.remove();
     });
     
-      function closeModal(e) {
-        if (
-          !bookmarkModal.contains(e.target) &&
-          !addBookmarkButton.contains(e.target)
-        ) {
-          bookmarkModal.remove();
-          removeCloseModal();
 
-          const controls = document.querySelector('.ytp-chrome-bottom');
-          if (!controls || !controls.contains(e.target)) {
+    // --- Outside click handler ---
+    function closeModal(e) {
+      if (
+        !bookmarkModal.contains(e.target) &&
+        !addBookmarkButton.contains(e.target)
+        ) {
+        bookmarkModal.remove();
+        removeCloseModal();
+
+        const controls = document.querySelector('.ytp-chrome-bottom');
+        if (!controls || !controls.contains(e.target)) {
             e.stopPropagation();
-          }
+        }
         }
       }
       
