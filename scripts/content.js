@@ -1,6 +1,3 @@
-const getStorage = (key) => new Promise((resolve) => chrome.storage.local.get(key, resolve));
-const setStorage = (data) => new Promise((resolve) => chrome.storage.local.set(data, resolve));
-
 function injectStyles() {
   const style = document.createElement("style");
   style.textContent = `
@@ -164,6 +161,8 @@ function setupTooltip(addBookmarkButton) {
 }
 
 function init() {
+  const getStorage = (key) => new Promise((resolve) => chrome.storage.local.get(key, resolve));
+  const setStorage = (data) => new Promise((resolve) => chrome.storage.local.set(data, resolve));
 
   // --- Inject styles ---
   injectStyles();
@@ -199,14 +198,19 @@ function init() {
         return;
       }
 
+      const channelLinks = document.querySelectorAll('#attributed-channel-name a.ytAttributedStringLink');
+      const channelName = document.querySelector('#attributed-channel-name')?.textContent?.trim() || 
+      document.querySelector("#channel-name a")?.textContent?.trim() || 
+      "Unknown Channel";
+      
       const videoData = {
         videoTitle: document.querySelector("h1.ytd-watch-metadata yt-formatted-string")?.textContent || "Untitled Video",
-        channelName: document.querySelector("#channel-name a")?.textContent || "Unknown Channel",
+        channelName,
         videoUrl: window.location.href.split("&")[0],
         timestamp: Math.floor(document.querySelector("video")?.currentTime || 0),
       };
       createSaveModal(videoData);
-    });
+  });
   }
 
   function createSaveModal(videoData) {
