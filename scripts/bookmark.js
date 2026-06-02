@@ -1,14 +1,18 @@
 import { getStorage, setStorage } from "./storage.js";
 import { getActiveCategory } from "./state.js";
 
+function filterBookmarksByCategory(bookmarks, category) {
+  return category === 'All' ? bookmarks : bookmarks.filter((b) => b.category === category);
+}
+
 export async function searchBookmarks(query) {
   const result = await getStorage('bookmarks');
   
   const category = getActiveCategory();
   const bookmarks = result.bookmarks || [];
 
-  const filteredBookmarks = category === 'All' ? bookmarks : bookmarks.filter((b) => b.category === category);
-  const filteredFromSearch = filteredBookmarks.filter((b) => b.customName.toLowerCase().includes(query.toLowerCase()));
+  const categoryFiltered = filterBookmarksByCategory(bookmarks, category);
+  const filteredFromSearch = categoryFiltered.filter((b) => b.customName.toLowerCase().includes(query.toLowerCase()));
   renderBookmarks(filteredFromSearch);
 }
 
@@ -31,26 +35,27 @@ function createDetailRow(label, value, addHoverTitle = false) {
 }
 
 function createBookmarkCard(bookmark) {
+  // --- Build card UI ---
   const card = document.createElement('div');
   card.className = 'bookmark-card';
 
   const header = document.createElement('div');
   const bookmarkName = document.createElement('span');
   const bookmarkPlayVideoBtn = document.createElement('button');
-  const bookmarkDetailMenuBtn = document.createElement('button');
+  const bookmarkDetailsToggleBtn = document.createElement('button');
 
   header.className = 'bookmark-header';
   bookmarkName.className = 'bookmark-name';
   bookmarkPlayVideoBtn.className = 'bookmark-play-video-btn';
-  bookmarkDetailMenuBtn.className = 'bookmark-detail-menu-btn';
+  bookmarkDetailsToggleBtn.className = 'bookmark-detail-menu-btn';
 
   bookmarkName.textContent = bookmark.customName;
   bookmarkPlayVideoBtn.textContent = '▶';
-  bookmarkDetailMenuBtn.textContent = '⋮';
+  bookmarkDetailsToggleBtn.textContent = '⋮';
 
   header.appendChild(bookmarkName);
   header.appendChild(bookmarkPlayVideoBtn);
-  header.appendChild(bookmarkDetailMenuBtn);
+  header.appendChild(bookmarkDetailsToggleBtn);
 
   card.appendChild(header);
 
@@ -58,6 +63,8 @@ function createBookmarkCard(bookmark) {
     chrome.tabs.create({ url: `${bookmark.url}&t=${bookmark.timestamp}` });
   });
 
+
+  // --- Details section ---
   const detailsDiv = document.createElement('div');
   detailsDiv.className = 'bookmark-details';
 
@@ -83,12 +90,15 @@ function createBookmarkCard(bookmark) {
 
   card.appendChild(detailsDiv);
 
-  bookmarkDetailMenuBtn.addEventListener('click', () => {
+
+  // --- Details toggle ---
+  bookmarkDetailsToggleBtn.addEventListener('click', () => {
     detailsDiv.classList.toggle('expanded');
-    bookmarkDetailMenuBtn.classList.toggle('expanded');
+    bookmarkDetailsToggleBtn.classList.toggle('expanded');
   });
 
-  //Deleting Bookmarks
+
+  // --- Delete flow ---
  bookmarkDeleteButton.addEventListener('click', async () => {
     document.getElementById('delete-confirmation-message').textContent = 
       `Are you sure you want to delete "${bookmark.customName}"?`;
@@ -103,7 +113,7 @@ function createBookmarkCard(bookmark) {
       await setStorage({ bookmarks: updatedBookmarks });
 
       const category = getActiveCategory();
-      const filtered = category === 'All' ? updatedBookmarks : updatedBookmarks.filter((b) => b.category === category);
+      const filtered = filterBookmarksByCategory(updatedBookmarks, category);
       renderBookmarks(filtered);
 
       document.getElementById('delete-confirmation-overlay').classList.remove('visible');
@@ -123,44 +133,47 @@ function createBookmarkCard(bookmark) {
     cancelBtn.addEventListener('click', onCancel, { once: true });
   });
 
+
+  // --- Rename flow ---
   async function saveBookmarkRename(input, bookmarkId, oldName) {
     const result = await getStorage('bookmarks');
     const bookmarks = result.bookmarks || [];
 
     const bookmarkSafeName = input.value.trim().slice(0, 150) || oldName;
     const index = bookmarks.findIndex((b) => b.id === bookmarkId);
+    if (index === -1) return;
     
     bookmarks[index].customName = bookmarkSafeName;
     
     await setStorage({ bookmarks });
 
     const category = getActiveCategory();
-    const filtered = category === 'All' ? bookmarks : bookmarks.filter((b) => b.category === category);
+    const filtered = filterBookmarksByCategory(bookmarks, category);
     
     renderBookmarks(filtered);
   }
 
   //Renaming Bookmarks
   bookmarkRenameButton.addEventListener('click', () => {
-    const bookmarkRenameSpace = document.createElement('input');
-    bookmarkRenameSpace.value = bookmark.customName;
-    bookmarkRenameSpace.className = 'bookmark-rename-input';
+    const bookmarkRenameInput = document.createElement('input');
+    bookmarkRenameInput.value = bookmark.customName;
+    bookmarkRenameInput.className = 'bookmark-rename-input';
 
     const oldBookmarkName = bookmark.customName;
-    bookmarkName.replaceWith(bookmarkRenameSpace);
-    bookmarkRenameSpace.select();
+    bookmarkName.replaceWith(bookmarkRenameInput);
+    bookmarkRenameInput.select();
     
     let isSaved = false;
 
-    bookmarkRenameSpace.addEventListener('keydown', async (e) => {
+    bookmarkRenameInput.addEventListener('keydown', async (e) => {
       if (e.key === 'Enter') {
         isSaved = true;
-        await saveBookmarkRename(bookmarkRenameSpace, bookmark.id, oldBookmarkName);
+        await saveBookmarkRename(bookmarkRenameInput, bookmark.id, oldBookmarkName);
       }
     });
 
-    bookmarkRenameSpace.addEventListener('blur', async () => {
-      if (!isSaved) await saveBookmarkRename(bookmarkRenameSpace, bookmark.id, oldBookmarkName);
+    bookmarkRenameInput.addEventListener('blur', async () => {
+      if (!isSaved) await saveBookmarkRename(bookmarkRenameInput, bookmark.id, oldBookmarkName);
     });
   });  
   return card;
@@ -195,7 +208,7 @@ export async function initBookmarks() {
     if (changes.bookmarks) {
       const bookmarks = changes.bookmarks.newValue || [];
       const category = getActiveCategory();
-      const filtered = category === 'All' ? bookmarks : bookmarks.filter((b) => b.category === category);
+      const filtered = filterBookmarksByCategory(bookmarks, category);
       renderBookmarks(filtered);
     }
   });

@@ -45,19 +45,19 @@ function createCategoryContextMenu(wrapper, categories) {
     categoryButton.replaceWith(renameInput);
     renameInput.select();
 
-  async function saveRename() {
-    const safeName = renameInput.value.trim().slice(0, 50) || oldName;
-    const index = categories.indexOf(oldName);
-    categories[index] = safeName;
+    async function saveRename() {
+      const safeName = renameInput.value.trim().slice(0, 50) || oldName;
+      const index = categories.indexOf(oldName);
+      categories[index] = safeName;
 
-    const result = await getStorage('bookmarks');
-    const bookmarks = result.bookmarks || [];
+      const result = await getStorage('bookmarks');
+      const bookmarks = result.bookmarks || [];
 
-    const updatedBookmarks = bookmarks.map((b) => b.category === oldName ? { ...b, category: safeName } : b );
+      const updatedBookmarks = bookmarks.map((b) => b.category === oldName ? { ...b, category: safeName } : b );
 
-    if (getActiveCategory() === oldName) {
-      setActiveCategory(safeName);
-    } 
+      if (getActiveCategory() === oldName) {
+        setActiveCategory(safeName);
+      } 
 
     await setStorage({ categories, bookmarks: updatedBookmarks });
     renderCategories(categories);
@@ -96,10 +96,9 @@ function createCategoryContextMenu(wrapper, categories) {
     async function onConfirm() {
       const updatedCategories = categories.filter((cat) => cat !== nameToDelete);
       await setStorage({ categories: updatedCategories });
+      setActiveCategory('All');
       renderCategories(updatedCategories);
       document.getElementById('delete-confirmation-overlay').classList.remove('visible');
-
-      setActiveCategory('All');
       renderFilteredBookmarks('All');
     }
 
