@@ -50,6 +50,11 @@ function createCategoryDetailMenu(wrapper, categories) {
     const bookmarks = result.bookmarks || [];
 
     const updatedBookmarks = bookmarks.map((b) => b.category === oldName ? { ...b, category: safeName } : b );
+
+    if (getActiveCategory() === oldName) {
+      setActiveCategory(safeName);
+    } 
+    
     await setStorage({ categories, bookmarks: updatedBookmarks });
     renderCategories(categories);
   }
@@ -118,7 +123,7 @@ function createCategoryWrapper(category, categories) {
   button.textContent = category;
   button.setAttribute("data-category", category);
 
-  if (category === "All") {
+  if (category === getActiveCategory()) {
     button.classList.add("active");
   }
 
