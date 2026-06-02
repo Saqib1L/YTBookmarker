@@ -1,5 +1,5 @@
 import { getStorage, setStorage } from "./storage.js";
-import { renderBookmarks } from "./bookmark.js";
+import { renderFilteredBookmarks } from "./bookmark.js";
 import { getActiveCategory, setActiveCategory } from "./state.js";
 
 function createCategoryDetailMenu(wrapper, categories) {
@@ -57,14 +57,17 @@ function createCategoryDetailMenu(wrapper, categories) {
     categoryDetailMenu.remove();
     wrapper.classList.remove('menu-open');
 
+    let isSaved = false;
+
     renameSpace.addEventListener("keydown", async (e) => {
       if (e.key === "Enter") {
+        isSaved = true;
         await saveRename();
       }
     });
 
     renameSpace.addEventListener("blur", async () => {
-      await saveRename();
+      if (!isSaved) { await saveRename() };
     });
   });
 
@@ -87,7 +90,7 @@ function createCategoryDetailMenu(wrapper, categories) {
       document.getElementById('delete-confirmation-overlay').classList.remove('visible');
 
       setActiveCategory('All');
-      renderAndFilterBookmarks('All');
+      renderFilteredBookmarks('All');
     }
 
     function onCancel() {
@@ -105,20 +108,6 @@ function createCategoryDetailMenu(wrapper, categories) {
   });
   return categoryDetailMenu;
 }
-
-
-async function renderAndFilterBookmarks(category) {
-  const result = await getStorage('bookmarks');
-  const bookmarks = result.bookmarks || [];
-
-  if(category === 'All') {
-    renderBookmarks(bookmarks);
-  } else {
-    const filtered = bookmarks.filter((b) => b.category === category);
-    renderBookmarks(filtered);
-  }
-}
-
 
 function createCategoryWrapper(category, categories) {
   const wrapper = document.createElement("div");
@@ -159,11 +148,12 @@ function createCategoryWrapper(category, categories) {
   });
     button.classList.add('active');
     setActiveCategory(category);
-    renderAndFilterBookmarks(category);
+    renderFilteredBookmarks(category);
   });
 
   return wrapper;
 }
+
 
 function renderCategories(categories) {
   const list = document.getElementById("categories-list");
@@ -206,14 +196,17 @@ export async function initCategories() {
         renderCategories(categories);
       }
 
+      let isSaved = false;
+
       inputElement.addEventListener("keydown", async (e) => {
         if (e.key === "Enter") {
+          isSaved = true;
           await saveNewCategory();
         }
       });
 
       inputElement.addEventListener("blur", async () => {
-        await saveNewCategory();
+        if (!isSaved) await saveNewCategory();
       });
     });
 }

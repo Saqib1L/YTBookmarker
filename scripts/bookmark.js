@@ -149,13 +149,18 @@ function createBookmarkCard(bookmark) {
     const oldBookmarkName = bookmark.customName;
     bookmarkName.replaceWith(bookmarkRenameSpace);
     bookmarkRenameSpace.select();
+    
+    let isSaved = false;
 
     bookmarkRenameSpace.addEventListener('keydown', async (e) => {
-      if (e.key === 'Enter') await saveBookmarkRename(bookmarkRenameSpace, bookmark.id, oldBookmarkName);
+      if (e.key === 'Enter') {
+        isSaved = true;
+        await saveBookmarkRename(bookmarkRenameSpace, bookmark.id, oldBookmarkName);
+      }
     });
 
     bookmarkRenameSpace.addEventListener('blur', async () => {
-      await saveBookmarkRename(bookmarkRenameSpace, bookmark.id, oldBookmarkName);
+      if (!isSaved) await saveBookmarkRename(bookmarkRenameSpace, bookmark.id, oldBookmarkName);
     });
   });  
   return card;
@@ -169,6 +174,13 @@ export function renderBookmarks(bookmarks) {
     const card = createBookmarkCard(bookmark);
     bookmarkList.appendChild(card);
   });
+}
+
+export async function renderFilteredBookmarks(category) {
+  const result = await getStorage('bookmarks');
+  const bookmarks = result.bookmarks || [];
+  const filtered = category === 'All' ? bookmarks : bookmarks.filter((b) => b.category === category);
+  renderBookmarks(filtered);
 }
 
 export async function initBookmarks() {
