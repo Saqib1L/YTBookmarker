@@ -133,7 +133,11 @@ function createBookmarkCard(bookmark) {
     bookmarks[index].customName = bookmarkSafeName;
     
     await setStorage({ bookmarks });
-    renderBookmarks(bookmarks);
+
+    const category = getActiveCategory();
+    const filtered = category === 'All' ? bookmarks : bookmarks.filter((b) => b.category === category);
+    
+    renderBookmarks(filtered);
   }
 
   //Renaming Bookmarks

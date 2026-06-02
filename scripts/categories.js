@@ -85,6 +85,9 @@ function createCategoryDetailMenu(wrapper, categories) {
       await setStorage({ categories: updatedCategories });
       renderCategories(updatedCategories);
       document.getElementById('delete-confirmation-overlay').classList.remove('visible');
+
+      setActiveCategory('All');
+      renderAndFilterBookmarks('All');
     }
 
     function onCancel() {
