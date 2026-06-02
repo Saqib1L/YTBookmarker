@@ -2,9 +2,11 @@ import { getStorage, setStorage } from "./storage.js";
 import { renderFilteredBookmarks } from "./bookmark.js";
 import { getActiveCategory, setActiveCategory } from "./state.js";
 
-function createCategoryDetailMenu(wrapper, categories) {
-  const categoryDetailMenu = document.createElement("div");
-  categoryDetailMenu.className = "category-detail-menu";
+function createCategoryContextMenu(wrapper, categories) {
+
+  // --- Build menu UI ---
+  const contextMenu = document.createElement("div");
+  contextMenu.className = "category-detail-menu";
 
   const categoryRenameButton = document.createElement("button");
   const categoryDeleteButton = document.createElement("button");
@@ -14,35 +16,37 @@ function createCategoryDetailMenu(wrapper, categories) {
   categoryRenameButton.className = "category-menu-rename-button";
   categoryDeleteButton.className = "category-menu-delete-button";
 
-  categoryDetailMenu.appendChild(categoryRenameButton);
-  categoryDetailMenu.appendChild(categoryDeleteButton);
+  contextMenu.appendChild(categoryRenameButton);
+  contextMenu.appendChild(categoryDeleteButton);
 
+
+  // --- Outside click handler ---
   function onOutsideClick(e) {
     if (!wrapper.contains(e.target)) {
-      categoryDetailMenu.remove();
+      contextMenu.remove();
       wrapper.classList.remove('menu-open')
       document.removeEventListener('click', onOutsideClick);
     }
   }
-
   document.removeEventListener('click', onOutsideClick);
   document.addEventListener('click', onOutsideClick);
 
-  //handle renaming
+
+   // --- Rename flow ---
   const categoryButton = wrapper.querySelector(".category-item");
   categoryRenameButton.addEventListener("click", () => {
     document.removeEventListener('click', onOutsideClick)
 
-    const renameSpace = document.createElement("input");
-    renameSpace.value = categoryButton.textContent;
-    renameSpace.className = "category-input";
+    const renameInput = document.createElement("input");
+    renameInput.value = categoryButton.textContent;
+    renameInput.className = "category-input";
 
     const oldName = categoryButton.getAttribute("data-category");
-    categoryButton.replaceWith(renameSpace);
-    renameSpace.select();
+    categoryButton.replaceWith(renameInput);
+    renameInput.select();
 
   async function saveRename() {
-    const safeName = renameSpace.value.trim().slice(0, 50) || oldName;
+    const safeName = renameInput.value.trim().slice(0, 50) || oldName;
     const index = categories.indexOf(oldName);
     categories[index] = safeName;
 
@@ -54,33 +58,34 @@ function createCategoryDetailMenu(wrapper, categories) {
     if (getActiveCategory() === oldName) {
       setActiveCategory(safeName);
     } 
-    
+
     await setStorage({ categories, bookmarks: updatedBookmarks });
     renderCategories(categories);
   }
 
-    categoryDetailMenu.remove();
+    contextMenu.remove();
     wrapper.classList.remove('menu-open');
 
     let isSaved = false;
 
-    renameSpace.addEventListener("keydown", async (e) => {
+    renameInput.addEventListener("keydown", async (e) => {
       if (e.key === "Enter") {
         isSaved = true;
         await saveRename();
       }
     });
 
-    renameSpace.addEventListener("blur", async () => {
+    renameInput.addEventListener("blur", async () => {
       if (!isSaved) { await saveRename() };
     });
   });
 
-  //handle deleting
+
+  // --- Delete flow ---
   categoryDeleteButton.addEventListener('click', async () => {
     document.removeEventListener('click', onOutsideClick)
 
-    categoryDetailMenu.remove();
+    contextMenu.remove();
     wrapper.classList.remove('menu-open');
     
 
@@ -111,8 +116,9 @@ function createCategoryDetailMenu(wrapper, categories) {
     cancelBtn.removeEventListener('click', onCancel);
     cancelBtn.addEventListener('click', onCancel, {once: true});
   });
-  return categoryDetailMenu;
+  return contextMenu;
 }
+
 
 function createCategoryWrapper(category, categories) {
   const wrapper = document.createElement("div");
@@ -140,7 +146,7 @@ function createCategoryWrapper(category, categories) {
 
       wrapper.classList.add('menu-open');
 
-      const menu = createCategoryDetailMenu(wrapper, categories);
+      const menu = createCategoryContextMenu(wrapper, categories);
       wrapper.appendChild(menu);
     });
 
@@ -170,6 +176,13 @@ function renderCategories(categories) {
   });
 }
 
+async function saveNewCategory(input, fallbackName, categories) {
+  const safeName = input.value.trim().slice(0, 50) || fallbackName;
+  categories[categories.length - 1] = safeName;
+  await setStorage({ categories });
+  renderCategories(categories);
+}
+
 export async function initCategories() {
   const result = await getStorage("categories");
   renderCategories(result.categories || ["All"]);
@@ -194,24 +207,17 @@ export async function initCategories() {
       document.getElementById("categories-list").appendChild(inputElement);
       inputElement.select();
 
-      async function saveNewCategory() {
-        const safeName = inputElement.value.trim().slice(0, 50) || newName;
-        categories[categories.length - 1] = safeName;
-        await setStorage({ categories });
-        renderCategories(categories);
-      }
-
       let isSaved = false;
 
       inputElement.addEventListener("keydown", async (e) => {
         if (e.key === "Enter") {
           isSaved = true;
-          await saveNewCategory();
+          await saveNewCategory(inputElement, newName, categories);
         }
       });
 
       inputElement.addEventListener("blur", async () => {
-        if (!isSaved) await saveNewCategory();
+        if (!isSaved) await saveNewCategory(inputElement, newName, categories);
       });
     });
 }
