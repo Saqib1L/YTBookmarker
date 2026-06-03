@@ -46,22 +46,26 @@ function createCategoryContextMenu(wrapper, categories) {
     renameInput.select();
 
     async function saveRename() {
-      const safeName = renameInput.value.trim().slice(0, 50) || oldName;
-      const index = categories.indexOf(oldName);
-      categories[index] = safeName;
+      try {
+        const safeName = renameInput.value.trim().slice(0, 50) || oldName;
+        const index = categories.indexOf(oldName);
+        categories[index] = safeName;
 
-      const result = await getStorage('bookmarks');
-      const bookmarks = result.bookmarks || [];
+        const result = await getStorage('bookmarks');
+        const bookmarks = result.bookmarks || [];
 
-      const updatedBookmarks = bookmarks.map((b) => b.category === oldName ? { ...b, category: safeName } : b );
+        const updatedBookmarks = bookmarks.map((b) => b.category === oldName ? { ...b, category: safeName } : b );
 
-      if (getActiveCategory() === oldName) {
-        setActiveCategory(safeName);
-      } 
+        if (getActiveCategory() === oldName) {
+          setActiveCategory(safeName);
+        } 
 
-    await setStorage({ categories, bookmarks: updatedBookmarks });
-    renderCategories(categories);
-  }
+        await setStorage({ categories, bookmarks: updatedBookmarks });
+        renderCategories(categories);
+      } catch(error) {
+        console.error('Failed to rename category:', error);
+      }
+    }
 
     contextMenu.remove();
     wrapper.classList.remove('menu-open');
@@ -93,12 +97,16 @@ function createCategoryContextMenu(wrapper, categories) {
     document.getElementById('delete-confirmation-overlay').classList.add('visible');
 
     async function onConfirm() {
-      const updatedCategories = categories.filter((cat) => cat !== nameToDelete);
-      await setStorage({ categories: updatedCategories });
-      setActiveCategory('All');
-      renderCategories(updatedCategories);
-      document.getElementById('delete-confirmation-overlay').classList.remove('visible');
-      renderFilteredBookmarks('All');
+      try {
+        const updatedCategories = categories.filter((cat) => cat !== nameToDelete);
+        await setStorage({ categories: updatedCategories });
+        setActiveCategory('All');
+        renderCategories(updatedCategories);
+        document.getElementById('delete-confirmation-overlay').classList.remove('visible');
+        renderFilteredBookmarks('All');
+      } catch(error) {
+        console.error('Failed to delete category:', error);
+      }
     }
 
     function onCancel() {
@@ -175,19 +183,27 @@ function renderCategories(categories) {
 }
 
 async function saveNewCategory(input, fallbackName, categories) {
-  const safeName = input.value.trim().slice(0, 50) || fallbackName;
-  categories[categories.length - 1] = safeName;
-  await setStorage({ categories });
-  renderCategories(categories);
+  try {
+    const safeName = input.value.trim().slice(0, 50) || fallbackName;
+    categories[categories.length - 1] = safeName;
+    await setStorage({ categories });
+    renderCategories(categories);
+  } catch(error) {
+    console.error('Failed to save new category:', error);
+  }
 }
 
 export async function initCategories() {
-  const result = await getStorage("categories");
-  renderCategories(result.categories || ["All"]);
+  try {
+    const result = await getStorage("categories");
+    renderCategories(result.categories || ["All"]);
+  } catch(error) {
+    console.error('Failed to load categories:', error);
+    renderCategories(["All"]);
+  }
 
-  document
-    .getElementById("new-category-btn")
-    .addEventListener("click", async () => {
+  document.getElementById("new-category-btn").addEventListener("click", async () => {
+    try {
       const result = await getStorage("categories");
       const categories = result.categories || ["All"];
       const nonAllCategories = categories.filter(
@@ -217,5 +233,8 @@ export async function initCategories() {
       inputElement.addEventListener("blur", async () => {
         if (!isSaved) await saveNewCategory(inputElement, newName, categories);
       });
-    });
+      } catch(error) {
+        console.error('Failed to create new category:', error);
+      }
+    });   
 }

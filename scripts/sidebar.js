@@ -17,7 +17,12 @@ async function snapSidebarClosed(sidebar, handle, pointerId) {
   handle.classList.remove('is-resizing');
   document.body.classList.remove('is-resizing');
   handle.releasePointerCapture(pointerId);
-  await setStorage({ sidebarWidth: 0 });
+
+  try {
+    await setStorage({ sidebarWidth: 0 });
+  } catch(error) {
+     console.error('Failed to save sidebar state:', error);
+  }
 }
 
 function updateToggleIcon(isCollapsed) {
@@ -66,13 +71,23 @@ function initSidebarResize(sidebar, handle) {
       sidebar.style.width = '0';
       sidebar.classList.add('collapsed');
       updateToggleIcon(true);
-      await setStorage({ sidebarWidth: 0});
+
+       try {
+        await setStorage({ sidebarWidth: 0 });
+      } catch (error) {
+        console.error('Failed to save sidebar state:', error);
+      }
     } else {
       const clampedWidth = Math.min(currentWidth, SIDEBAR_MAX_WIDTH);
       sidebar.style.width = `${clampedWidth}px`;
       sidebar.classList.remove('collapsed');
       updateToggleIcon(false);
-      await setStorage({ sidebarWidth: clampedWidth });
+      
+       try {
+        await setStorage({ sidebarWidth: clampedWidth });
+      } catch (error) {
+        console.error('Failed to save sidebar width:', error);
+      }
     }
   });
 }
@@ -85,11 +100,20 @@ function initSidebarToggle(sidebar, toggleBtn) {
       sidebar.style.width = `${SIDEBAR_DEFAULT_WIDTH}px`;
       sidebar.classList.remove('collapsed');
       updateToggleIcon(false);
-      await setStorage({ sidebarWidth: SIDEBAR_DEFAULT_WIDTH });
+
+      try {
+        await setStorage({ sidebarWidth: SIDEBAR_DEFAULT_WIDTH });
+      } catch (error) {
+        console.error('Failed to save sidebar state:', error);
+      }
     } else {
       sidebar.style.width = '0';
       sidebar.classList.add('collapsed');
-      await setStorage({ sidebarWidth: 0 });
+     try {
+        await setStorage({ sidebarWidth: 0 });
+      } catch (error) {
+        console.error('Failed to save sidebar state:', error);
+      }
       updateToggleIcon(true);
     }
   });
@@ -100,15 +124,21 @@ export async function initSidebar() {
   const handle = document.getElementById('sidebar-resize-handle');
   const toggleBtn = document.getElementById('sidebar-toggle-btn');
 
-  const result = await getStorage('sidebarWidth');
-  const savedWidth = result.sidebarWidth ?? SIDEBAR_MAX_WIDTH;
+  try {
+    const result = await getStorage('sidebarWidth');
+    const savedWidth = result.sidebarWidth ?? SIDEBAR_MAX_WIDTH;
 
-  if (savedWidth === 0) {
-  sidebar.classList.add('collapsed');
-  } else {
-    sidebar.style.width = `${savedWidth}px`;
+    if (savedWidth === 0) {
+      sidebar.classList.add('collapsed');
+      } else {
+        sidebar.style.width = `${savedWidth}px`;
+      }
+      updateToggleIcon(savedWidth === 0);
+  } catch(error) {
+    console.error('Failed to load sidebar state:', error);
+    sidebar.style.width = `${SIDEBAR_DEFAULT_WIDTH}px`;
+    updateToggleIcon(false);
   }
-  updateToggleIcon(savedWidth === 0);
 
   initSidebarResize(sidebar, handle);
   initSidebarToggle(sidebar, toggleBtn);
