@@ -363,7 +363,24 @@ function init() {
       setTimeout(() => {
         document.addEventListener("click", closeModal, true);
       }, 0);
-  } 
+  }
+  
+ document.addEventListener('keydown', (e) => {
+    if (
+      document.activeElement.tagName === 'INPUT' ||
+      document.activeElement.tagName === 'TEXTAREA'
+    ) return;
+
+    if (e.key === 'a' || e.key === 'A') {
+      addBookmarkButton.click();
+    }
+
+    if (e.key === 'Enter') {
+      const saveBtn = document.querySelector('.bookmark-save-btn');
+      if (saveBtn) saveBtn.click();
+    }
+}, true);
+
 }
 
 if (!window.__ytBookmarkerLoaded) {
