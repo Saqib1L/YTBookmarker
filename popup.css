@@ -176,11 +176,19 @@ body {
    SIDEBAR
    ============================================================ */
 .sidebar {
-  width: 40%;
+  width: 180px;
+  flex-shrink: 0;
+  min-width: 0;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   border-right: 1px solid;
-  transition: border-color 0.2s;
+  transition: width 0.2s ease, border-color 0.2s;
+}
+
+.sidebar.collapsed {
+  width: 0;
+  border-right: none;
 }
 
 .popup[data-theme="light"] .sidebar {
@@ -189,6 +197,65 @@ body {
 
 .popup[data-theme="dark"] .sidebar {
   border-right-color: #3a3a3a;
+}
+
+/* ============================================================
+   SIDEBAR RESIZE HANDLE
+   ============================================================ */
+.sidebar-resize-handle {
+  width: 4px;
+  flex-shrink: 0;
+  cursor: col-resize;
+  transition: background-color 0.2s;
+}
+
+.sidebar-resize-handle:hover,
+.sidebar-resize-handle.is-resizing {
+  background-color: #FF0000;
+}
+
+.sidebar.collapsed + .sidebar-resize-handle {
+  display: none;
+}
+
+/* ============================================================
+   SIDEBAR TOGGLE BUTTON
+   ============================================================ */
+.sidebar-toggle-btn {
+  flex-shrink: 0;
+  padding: 0.4rem;
+  border-radius: 0.4rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.popup[data-theme="light"] .sidebar-toggle-btn {
+  color: #4b5563;
+}
+
+.popup[data-theme="dark"] .sidebar-toggle-btn {
+  color: #9ca3af;
+}
+
+.popup[data-theme="light"] .sidebar-toggle-btn:hover {
+  background-color: #f3f4f6;
+}
+
+.popup[data-theme="dark"] .sidebar-toggle-btn:hover {
+  background-color: #2a2a2a;
+}
+
+/* ============================================================
+   GLOBAL RESIZING STATE
+   ============================================================ */
+body.is-resizing {
+  user-select: none;
+  cursor: col-resize;
 }
 
 /* ============================================================
@@ -206,8 +273,10 @@ body {
   justify-content: space-between;
   position: relative;
   padding-right: 0.25rem;
+  
   white-space: normal;
   word-break: break-word;
+  
   transition: background-color 0.25s ease;
 }
 
@@ -231,6 +300,9 @@ body {
   cursor: pointer;
   transition: border-left-color 0.15s ease, color 0.15s ease;
   color: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .category-item.active {

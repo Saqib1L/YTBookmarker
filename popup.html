@@ -24,6 +24,20 @@
 
         <!-- Header Bar -->
         <div class="header">
+          <button class="sidebar-toggle-btn" id="sidebar-toggle-btn">
+
+          <svg id="sidebar-icon-open" width="18" height="16" viewBox="0 0 26 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="20" height="18" rx="2"/>
+            <rect x="3" y="3" width="7" height="18" rx="2" fill="currentColor" stroke="none"/>
+            <line x1="10" y1="3" x2="10" y2="21"/>
+          </svg>
+
+          <svg id="sidebar-icon-closed" width="18" height="16" viewBox="0 0 26 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="20" height="18" rx="2"/>
+            <line x1="10" y1="3" x2="10" y2="21"/>
+          </svg>
+
+        </button>
           <div class="search-container">
             <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="11" cy="11" r="8"></circle>
@@ -54,7 +68,7 @@
         <div class="main-content">
 
           <!-- Sidebar -->
-          <div class="sidebar">
+          <div class="sidebar" id="sidebar">
             <div class="categories-list" id="categories-list"> 
             </div>
             <div class="new-category-container">
@@ -67,6 +81,8 @@
               </button>
             </div>
           </div>
+
+          <div class="sidebar-resize-handle" id="sidebar-resize-handle"></div>
 
           <!-- Bookmark Cards -->
           <div class="bookmarks-container">
