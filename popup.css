@@ -184,6 +184,7 @@ body {
   flex-direction: column;
   border-right: 1px solid;
   transition: width 0.2s ease, border-color 0.2s;
+  will-change: width;
 }
 
 .sidebar.collapsed {
@@ -265,6 +266,7 @@ body.is-resizing {
   flex: 1;
   overflow-y: auto;
   padding: 0.3rem 0;
+  overflow: hidden;
 }
 
 .category-item-wrapper {
@@ -405,40 +407,43 @@ body.is-resizing {
    ============================================================ */
 .new-category-container {
   padding: 0.6rem 0.8rem;
-  border-top: none;
-}
-
-.popup[data-theme="light"] .new-category-container {
-  border-top-color: #e5e7eb;
-}
-
-.popup[data-theme="dark"] .new-category-container {
-  border-top-color: #3a3a3a;
 }
 
 .new-category-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.2rem;
-  padding: 0.20rem 0.40rem;
-  border-radius: 0.5rem;
+  width: 1.4rem;
+  height: 1.4rem;
+  flex-shrink: 0;
+  border-radius: 0.25rem;
   border: none;
   cursor: pointer;
-  font-size: 0.7rem;
-  font-weight: 500;
-  transition: background-color 0.2s;
-  width: 100%;
-}
-
-.new-category-icon {
-  width: 1.1rem;
-  height: 1.1rem;
-  border-radius: 0.2rem;
+  font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
-  flex-shrink: 0;
+  transition: background-color 0.2s;
+  outline: none;
+  position: relative;
+}
+
+.new-category-btn::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  transform: none;
+  background: #2a2a2a;
+  color: #ffffff;
+  font-size: 0.65rem;
+  padding: 3px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.new-category-btn:hover::after {
+  opacity: 1;
 }
 
 .popup[data-theme="light"] .new-category-btn {

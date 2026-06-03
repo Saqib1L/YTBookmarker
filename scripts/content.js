@@ -265,7 +265,6 @@ function init() {
         return;
       }
 
-      const channelLinks = document.querySelectorAll('#attributed-channel-name a.ytAttributedStringLink');
       const channelName = document.querySelector('#attributed-channel-name')?.textContent?.trim() || 
       document.querySelector("#channel-name a")?.textContent?.trim() || 
       "Unknown Channel";
@@ -347,41 +346,47 @@ function init() {
 
     // --- Category population ---
     function populateCategories() {
-  if (!chrome.runtime?.id) return;
-  chrome.storage.local.get("categories", (result) => {
-    bookmarkDropdownList.innerHTML = '';
+      if (!chrome.runtime?.id) return;
+      chrome.storage.local.get("categories", (result) => {
+        bookmarkDropdownList.innerHTML = '';
 
-    const categories = result.categories || [];
-    categories.forEach((category) => {
-      if (category === "All") return;
+        const categories = result.categories || [];
+        categories.forEach((category) => {
+          if (category === "All") return;
 
-      const option = document.createElement('div');
-      option.className = 'bookmark-dropdown-option';
-      if (category === selectedCategory) option.classList.add('selected');
+          const option = document.createElement('div');
+          option.className = 'bookmark-dropdown-option';
+          if (category === selectedCategory) option.classList.add('selected');
 
-      const optionText = document.createElement('span');
-      optionText.textContent = category;
+          const optionText = document.createElement('span');
+          optionText.textContent = category;
 
-      const optionCheck = document.createElement('span');
-      optionCheck.textContent = '✓';
-      optionCheck.style.opacity = category === selectedCategory ? '1' : '0';
+          const optionCheck = document.createElement('span');
+          optionCheck.textContent = '✓';
+          optionCheck.style.opacity = category === selectedCategory ? '1' : '0';
 
-      option.appendChild(optionText);
-      option.appendChild(optionCheck);
+          option.appendChild(optionText);
+          option.appendChild(optionCheck);
 
-      option.addEventListener('click', () => {
-        selectedCategory = category;
-        bookmarkDropdownTrigger.textContent = category;
-        bookmarkDropdownTrigger.classList.remove('placeholder');
-        bookmarkDropdownTrigger.appendChild(bookmarkDropdownChevron);
-        bookmarkDropdownList.classList.remove('open');
-        populateCategories();
+         option.addEventListener('click', () => {
+          if (selectedCategory === category) {
+            selectedCategory = '';
+            bookmarkDropdownTrigger.textContent = 'Select a category';
+            bookmarkDropdownTrigger.classList.add('placeholder');
+          } else {
+            selectedCategory = category;
+            bookmarkDropdownTrigger.textContent = category;
+            bookmarkDropdownTrigger.classList.remove('placeholder');
+          }
+          bookmarkDropdownTrigger.appendChild(bookmarkDropdownChevron);
+          bookmarkDropdownList.classList.remove('open');
+          populateCategories();
+        });
+
+          bookmarkDropdownList.appendChild(option);
+        });
       });
-
-      bookmarkDropdownList.appendChild(option);
-    });
-  });
-}
+    }
 
 bookmarkDropdownTrigger.addEventListener('click', (e) => {
   e.stopPropagation();
@@ -447,19 +452,17 @@ bookmarkDropdownTrigger.addEventListener('click', (e) => {
       if (
         !bookmarkModal.contains(e.target) &&
         !addBookmarkButton.contains(e.target)
-        ) {
+      ) {
+        bookmarkDropdownList.classList.remove('open');
         bookmarkModal.remove();
         removeCloseModal();
 
         const controls = document.querySelector('.ytp-chrome-bottom');
         if (!controls || !controls.contains(e.target)) {
-            e.stopPropagation();
+          e.stopPropagation();
         }
-        }
-
-        bookmarkDropdownList.classList.remove('open');
-
       }
+    }
       
       setTimeout(() => {
         document.addEventListener("click", closeModal, true);
