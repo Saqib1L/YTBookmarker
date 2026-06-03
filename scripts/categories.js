@@ -88,7 +88,6 @@ function createCategoryContextMenu(wrapper, categories) {
     contextMenu.remove();
     wrapper.classList.remove('menu-open');
     
-
     const nameToDelete = categoryButton.getAttribute('data-category');
     document.getElementById('delete-confirmation-message').textContent = `Are you sure you want to delete the category "${nameToDelete}"?`;
     document.getElementById('delete-confirmation-overlay').classList.add('visible');
