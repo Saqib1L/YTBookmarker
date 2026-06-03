@@ -135,6 +135,73 @@ function injectStyles() {
       border-color: rgba(255, 255, 255, 0.6);
       color: #ffffff;
     }
+
+    .bookmark-dropdown {
+      position: relative;
+      width: 100%;
+    }
+
+    .bookmark-dropdown-trigger {
+      width: 100%;
+      padding: 6px 0;
+      border: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      background: transparent;
+      color: #ffffff;
+      font-size: 13px;
+      outline: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-align: left;
+    }
+
+    .bookmark-dropdown-trigger.placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .bookmark-dropdown-list {
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 0;
+      width: 100%;
+      background: rgba(28, 28, 28, 0.98);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      z-index: 99999;
+    }
+
+    .bookmark-dropdown-list.open {
+      display: flex;
+    }
+
+    .bookmark-dropdown-option {
+      padding: 8px 12px;
+      font-size: 13px;
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background-color 0.15s;
+    }
+
+    .bookmark-dropdown-option:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .bookmark-dropdown-option.selected {
+      color: #FF0000;
+    }
+
+    .bookmark-dropdown-chevron {
+      font-size: 10px;
+      opacity: 0.6;
+    }
   `;
 
   document.head.appendChild(style);
@@ -236,8 +303,25 @@ function init() {
     categoryLabel.className = "yt-bookmarker-label";
     categoryLabel.textContent = "Category";
 
-    const bookmarkCategory = document.createElement("select");
-    bookmarkCategory.className = "bookmark-category";
+    let selectedCategory = '';
+
+    const bookmarkDropdown = document.createElement('div');
+    bookmarkDropdown.className = 'bookmark-dropdown';
+
+    const bookmarkDropdownTrigger = document.createElement('button');
+    bookmarkDropdownTrigger.className = 'bookmark-dropdown-trigger placeholder';
+    bookmarkDropdownTrigger.textContent = 'Select a category';
+
+    const bookmarkDropdownChevron = document.createElement('span');
+    bookmarkDropdownChevron.className = 'bookmark-dropdown-chevron';
+    bookmarkDropdownChevron.textContent = '▲';
+
+    const bookmarkDropdownList = document.createElement('div');
+    bookmarkDropdownList.className = 'bookmark-dropdown-list';
+
+    bookmarkDropdownTrigger.appendChild(bookmarkDropdownChevron);
+    bookmarkDropdown.appendChild(bookmarkDropdownTrigger);
+    bookmarkDropdown.appendChild(bookmarkDropdownList);
 
     const bookmarkSaveButton = document.createElement("button");
     bookmarkSaveButton.className = "bookmark-save-btn";
@@ -252,45 +336,59 @@ function init() {
     bookmarkActions.appendChild(bookmarkSaveButton);
     bookmarkActions.appendChild(bookmarkCancelButton);
 
-    const categoryWrapper = document.createElement("div");
-    categoryWrapper.className = "bookmark-category-wrapper";
-    categoryWrapper.appendChild(bookmarkCategory);
-
     bookmarkModal.appendChild(nameLabel);
     bookmarkModal.appendChild(bookmarkCustomName);
     bookmarkModal.appendChild(categoryLabel);
-    bookmarkModal.appendChild(categoryWrapper);
+    bookmarkModal.appendChild(bookmarkDropdown);
+
     bookmarkModal.appendChild(bookmarkActions);
     document.querySelector(".html5-video-player").appendChild(bookmarkModal);
 
 
     // --- Category population ---
     function populateCategories() {
-      if (!chrome.runtime?.id) return;
-      chrome.storage.local.get("categories", (result) => {
-        const selected = bookmarkCategory.value;
-        bookmarkCategory.innerHTML = '';
+  if (!chrome.runtime?.id) return;
+  chrome.storage.local.get("categories", (result) => {
+    bookmarkDropdownList.innerHTML = '';
 
-        const placeholder = document.createElement("option");
-        placeholder.value = "";
-        placeholder.textContent = "Select a category";
-        placeholder.disabled = true;
-        placeholder.selected = !selected;
-        bookmarkCategory.appendChild(placeholder);
+    const categories = result.categories || [];
+    categories.forEach((category) => {
+      if (category === "All") return;
 
-        const categories = result.categories || [];
-        categories.forEach((category) => {
-          if (category === "All") return;
-          const option = document.createElement("option");
-          option.value = category;
-          option.textContent = category;
-          if (category === selected) option.selected = true;
-          bookmarkCategory.appendChild(option);
-        });
+      const option = document.createElement('div');
+      option.className = 'bookmark-dropdown-option';
+      if (category === selectedCategory) option.classList.add('selected');
+
+      const optionText = document.createElement('span');
+      optionText.textContent = category;
+
+      const optionCheck = document.createElement('span');
+      optionCheck.textContent = '✓';
+      optionCheck.style.opacity = category === selectedCategory ? '1' : '0';
+
+      option.appendChild(optionText);
+      option.appendChild(optionCheck);
+
+      option.addEventListener('click', () => {
+        selectedCategory = category;
+        bookmarkDropdownTrigger.textContent = category;
+        bookmarkDropdownTrigger.classList.remove('placeholder');
+        bookmarkDropdownTrigger.appendChild(bookmarkDropdownChevron);
+        bookmarkDropdownList.classList.remove('open');
+        populateCategories();
       });
-    }
-    
 
+      bookmarkDropdownList.appendChild(option);
+    });
+  });
+}
+
+bookmarkDropdownTrigger.addEventListener('click', (e) => {
+  e.stopPropagation();
+  bookmarkDropdownList.classList.toggle('open');
+});
+    
+  
     // --- Storage change listener ---
     if (chrome.runtime?.id) {
       chrome.storage.onChanged.addListener(onStorageChanged); 
@@ -320,7 +418,7 @@ function init() {
           channel: videoData.channelName,
           url: videoData.videoUrl,
           timestamp: videoData.timestamp,
-          category: bookmarkCategory.value,
+          category: selectedCategory,
           savedAt: new Date().toLocaleString('en-GB', { 
             day: '2-digit', 
             month: '2-digit', 
@@ -358,6 +456,9 @@ function init() {
             e.stopPropagation();
         }
         }
+
+        bookmarkDropdownList.classList.remove('open');
+
       }
       
       setTimeout(() => {
