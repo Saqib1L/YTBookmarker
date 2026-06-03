@@ -6,14 +6,16 @@ function filterBookmarksByCategory(bookmarks, category) {
 }
 
 export async function searchBookmarks(query) {
-  const result = await getStorage('bookmarks');
-  
-  const category = getActiveCategory();
-  const bookmarks = result.bookmarks || [];
-
-  const categoryFiltered = filterBookmarksByCategory(bookmarks, category);
-  const filteredFromSearch = categoryFiltered.filter((b) => b.customName.toLowerCase().includes(query.toLowerCase()));
-  renderBookmarks(filteredFromSearch);
+  try {
+    const result = await getStorage('bookmarks');
+    const category = getActiveCategory();
+    const bookmarks = result.bookmarks || [];
+    const categoryFiltered = filterBookmarksByCategory(bookmarks, category);
+    const filteredFromSearch = categoryFiltered.filter((b) => b.customName.toLowerCase().includes(query.toLowerCase()));
+    renderBookmarks(filteredFromSearch);
+  } catch(error) {
+    console.error('Failed to search bookmarks:', error);
+  }
 }
 
 function createDetailRow(label, value, addHoverTitle = false) {
@@ -112,54 +114,66 @@ function createBookmarkCard(bookmark) {
     document.getElementById('delete-confirmation-message').textContent = 
       `Are you sure you want to delete "${bookmark.customName}"?`;
 
-    const result = await getStorage('bookmarks');
-    const bookmarks = result.bookmarks || [];
-    document.getElementById('delete-confirmation-overlay').classList.add('visible');
+    try {    
+      const result = await getStorage('bookmarks');
+      const bookmarks = result.bookmarks || [];
+      document.getElementById('delete-confirmation-overlay').classList.add('visible');
 
-    async function onConfirm() {
-      const updatedBookmarks = bookmarks.filter((b) => b.id !== bookmark.id);
-     
-      await setStorage({ bookmarks: updatedBookmarks });
+      async function onConfirm() {
+        try {
+          const updatedBookmarks = bookmarks.filter((b) => b.id !== bookmark.id);
+        
+          await setStorage({ bookmarks: updatedBookmarks });
 
-      const category = getActiveCategory();
-      const filtered = filterBookmarksByCategory(updatedBookmarks, category);
-      renderBookmarks(filtered);
+          const category = getActiveCategory();
+          const filtered = filterBookmarksByCategory(updatedBookmarks, category);
+          renderBookmarks(filtered);
 
-      document.getElementById('delete-confirmation-overlay').classList.remove('visible');
+          document.getElementById('delete-confirmation-overlay').classList.remove('visible');
+        } catch(error) {
+          console.error('Failed to delete bookmark:', error);
+        }
+      }
+
+      function onCancel() {
+        document.getElementById('delete-confirmation-overlay').classList.remove('visible');
+      }
+
+      const confirmBtn = document.getElementById('delete-confirmation-confirm');
+      const cancelBtn = document.getElementById('delete-confirmation-cancel');
+
+      confirmBtn.removeEventListener('click', onConfirm);
+      confirmBtn.addEventListener('click', onConfirm, { once: true });
+
+      cancelBtn.removeEventListener('click', onCancel);
+      cancelBtn.addEventListener('click', onCancel, { once: true });
+    } catch (error) {
+      console.error('Failed to load bookmarks for deletion:', error);
     }
-
-    function onCancel() {
-       document.getElementById('delete-confirmation-overlay').classList.remove('visible');
-    }
-
-    const confirmBtn = document.getElementById('delete-confirmation-confirm');
-    const cancelBtn = document.getElementById('delete-confirmation-cancel');
-
-    confirmBtn.removeEventListener('click', onConfirm);
-    confirmBtn.addEventListener('click', onConfirm, { once: true });
-
-    cancelBtn.removeEventListener('click', onCancel);
-    cancelBtn.addEventListener('click', onCancel, { once: true });
   });
 
 
   // --- Rename flow ---
   async function saveBookmarkRename(input, bookmarkId, oldName) {
-    const result = await getStorage('bookmarks');
-    const bookmarks = result.bookmarks || [];
+    try {
+      const result = await getStorage('bookmarks');
+      const bookmarks = result.bookmarks || [];
 
-    const bookmarkSafeName = input.value.trim().slice(0, 150) || oldName;
-    const index = bookmarks.findIndex((b) => b.id === bookmarkId);
-    if (index === -1) return;
-    
-    bookmarks[index].customName = bookmarkSafeName;
-    
-    await setStorage({ bookmarks });
+      const bookmarkSafeName = input.value.trim().slice(0, 150) || oldName;
+      const index = bookmarks.findIndex((b) => b.id === bookmarkId);
+      if (index === -1) return;
+      
+      bookmarks[index].customName = bookmarkSafeName;
+      
+      await setStorage({ bookmarks });
 
-    const category = getActiveCategory();
-    const filtered = filterBookmarksByCategory(bookmarks, category);
-    
-    renderBookmarks(filtered);
+      const category = getActiveCategory();
+      const filtered = filterBookmarksByCategory(bookmarks, category);
+      
+      renderBookmarks(filtered);
+    } catch(error) {
+      console.error('Failed to rename bookmark:', error);
+    }
   }
 
   //Renaming Bookmarks
@@ -199,15 +213,24 @@ export function renderBookmarks(bookmarks) {
 }
 
 export async function renderFilteredBookmarks(category) {
-  const result = await getStorage('bookmarks');
-  const bookmarks = result.bookmarks || [];
-  const filtered = category === 'All' ? bookmarks : bookmarks.filter((b) => b.category === category);
-  renderBookmarks(filtered);
+  try {
+    const result = await getStorage('bookmarks');
+    const bookmarks = result.bookmarks || [];
+    const filtered = category === 'All' ? bookmarks : bookmarks.filter((b) => b.category === category);
+    renderBookmarks(filtered);
+   } catch(error) {
+    console.error('Failed to render filtered bookmarks:', error);
+  }
 }
 
 export async function initBookmarks() {
-  const result = await getStorage('bookmarks');
-  renderBookmarks(result.bookmarks || []);
+  try {
+    const result = await getStorage('bookmarks');
+    renderBookmarks(result.bookmarks || []);
+  } catch(error) {
+    console.error('Failed to load bookmarks:', error);
+    renderBookmarks([]);
+  }
 
   document.getElementById('search-input').addEventListener('input', (e) => {
     searchBookmarks(e.target.value);

@@ -14,14 +14,23 @@ export function applyTheme(theme) {
 }
 
 export async function initTheme() {
-  const result = await getStorage('theme');
+  try {
+    const result = await getStorage('theme');
   applyTheme(result.theme || 'light');
+  } catch (error) {
+    console.error('Failed to load theme:', error);
+    applyTheme('light');
+  }
 
   document.getElementById('theme-toggle').addEventListener('click', async () => {
     const popup = document.getElementById('popup');
     const currentTheme = popup.getAttribute('data-theme');
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
     applyTheme(newTheme);
-    await setStorage({ theme: newTheme });
+    try {
+     await setStorage({ theme: newTheme });
+    } catch (error) {
+      console.error("Failed to save theme: ", error);
+    }
   });
 }

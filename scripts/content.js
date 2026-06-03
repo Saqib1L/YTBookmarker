@@ -228,8 +228,19 @@ function setupTooltip(addBookmarkButton) {
 }
 
 function init() {
-  const getStorage = (key) => new Promise((resolve) => chrome.storage.local.get(key, resolve));
-  const setStorage = (data) => new Promise((resolve) => chrome.storage.local.set(data, resolve));
+  const getStorage = (key) => new Promise((resolve, reject) => {
+    chrome.storage.local.get(key, (result) => {
+      if (chrome.runtime.lastError) reject(chrome.runtime.lastError);
+      else resolve(result);
+    });
+  });
+
+  const setStorage = (data) => new Promise((resolve, reject) => {
+    chrome.storage.local.set(data, () => {
+      if (chrome.runtime.lastError) reject(chrome.runtime.lastError);
+      else resolve();
+    });
+  });
 
   // --- Inject styles ---
   injectStyles();
@@ -412,31 +423,35 @@ bookmarkDropdownTrigger.addEventListener('click', (e) => {
 
     // --- Save flow ---
     bookmarkSaveButton.addEventListener("click", async () => {
-      removeCloseModal();
-      const result = await getStorage("bookmarks");
-      const bookmarks = result.bookmarks || [];
+      try {
+        removeCloseModal();
+        const result = await getStorage("bookmarks");
+        const bookmarks = result.bookmarks || [];
 
-      const newBookmark = {
-          id: Date.now().toString(),
-          customName: bookmarkCustomName.value.trim() || videoData.videoTitle,
-          youtubeTitle: videoData.videoTitle,
-          channel: videoData.channelName,
-          url: videoData.videoUrl,
-          timestamp: videoData.timestamp,
-          category: selectedCategory,
-          savedAt: new Date().toLocaleString('en-GB', { 
-            day: '2-digit', 
-            month: '2-digit', 
-            year: 'numeric',
-            hour: '2-digit', 
-            minute: '2-digit',
-            hour12: true 
-          }).replace(/am|pm/i, (match) => match.toUpperCase()),
-        };
+        const newBookmark = {
+            id: Date.now().toString(),
+            customName: bookmarkCustomName.value.trim() || videoData.videoTitle,
+            youtubeTitle: videoData.videoTitle,
+            channel: videoData.channelName,
+            url: videoData.videoUrl,
+            timestamp: videoData.timestamp,
+            category: selectedCategory,
+            savedAt: new Date().toLocaleString('en-GB', { 
+              day: '2-digit', 
+              month: '2-digit', 
+              year: 'numeric',
+              hour: '2-digit', 
+              minute: '2-digit',
+              hour12: true 
+            }).replace(/am|pm/i, (match) => match.toUpperCase()),
+          };
 
-      bookmarks.push(newBookmark);
-      await setStorage({ bookmarks });
-      bookmarkModal.remove();
+        bookmarks.push(newBookmark);
+        await setStorage({ bookmarks });
+        bookmarkModal.remove();
+      } catch(error) {
+        console.error('Failed to save bookmark:', error);
+      }
     });
 
 
