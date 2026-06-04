@@ -173,6 +173,8 @@ function injectStyles() {
       display: none;
       flex-direction: column;
       z-index: 99999;
+      max-height: 150px;
+overflow-y: auto;
     }
 
     .bookmark-dropdown-list.open {
@@ -329,6 +331,10 @@ function init() {
     const bookmarkDropdownList = document.createElement('div');
     bookmarkDropdownList.className = 'bookmark-dropdown-list';
 
+    bookmarkDropdownList.addEventListener('wheel', (e) => {
+      e.stopPropagation();
+    });
+
     bookmarkDropdownTrigger.appendChild(bookmarkDropdownChevron);
     bookmarkDropdown.appendChild(bookmarkDropdownTrigger);
     bookmarkDropdown.appendChild(bookmarkDropdownList);
@@ -353,6 +359,12 @@ function init() {
 
     bookmarkModal.appendChild(bookmarkActions);
     document.querySelector(".html5-video-player").appendChild(bookmarkModal);
+
+    bookmarkModal.addEventListener('click', (e) => {
+      if (!bookmarkDropdown.contains(e.target)) {
+        bookmarkDropdownList.classList.remove('open');
+      }
+    });
 
 
     // --- Category population ---
@@ -399,10 +411,10 @@ function init() {
       });
     }
 
-bookmarkDropdownTrigger.addEventListener('click', (e) => {
-  e.stopPropagation();
-  bookmarkDropdownList.classList.toggle('open');
-});
+    bookmarkDropdownTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      bookmarkDropdownList.classList.toggle('open');
+    });
     
   
     // --- Storage change listener ---
