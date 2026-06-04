@@ -48,7 +48,6 @@ function createBookmarkCard(bookmark) {
   // --- Build card UI ---
   const card = document.createElement('div');
   card.className = 'bookmark-card';
-  card.dataset.id = bookmark.id;
 
   const header = document.createElement('div');
   const bookmarkName = document.createElement('span');
@@ -205,27 +204,11 @@ function createBookmarkCard(bookmark) {
 
 export function renderBookmarks(bookmarks) {
   const bookmarkList = document.getElementById('bookmarks-list');
-  // bookmarkList.innerHTML = '';
+  bookmarkList.innerHTML = '';
 
-  /* bookmarks.forEach((bookmark) => {
+  bookmarks.forEach((bookmark) => {
     const card = createBookmarkCard(bookmark);
     bookmarkList.appendChild(card);
-  });
-  */
-
-  const existingCards = bookmarkList.querySelectorAll('.bookmark-card');
-  existingCards.forEach((card) => {
-    const stillExists = bookmarks.find((b) => b.id === card.dataset.id);
-    if (!stillExists) card.remove();
-  });
-
-  bookmarks.forEach((bookmark, index) => {
-    const existingCard = bookmarkList.querySelector(`[data-id="${bookmark.id}"]`);
-
-    if(!existingCard) {
-      const card = createBookmarkCard(bookmark);
-       bookmarkList.insertBefore(card, bookmarkList.children[index] || null);
-    }
   });
 }
 
