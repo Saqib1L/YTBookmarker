@@ -264,9 +264,9 @@ body.is-resizing {
    ============================================================ */
 .categories-list {
   flex: 1;
-  overflow-y: auto;
   padding: 0.3rem 0;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .category-item-wrapper {
