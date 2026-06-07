@@ -143,4 +143,3 @@ export async function initSidebar() {
   initSidebarResize(sidebar, handle);
   initSidebarToggle(sidebar, toggleBtn);
 }
-//
