@@ -70,7 +70,7 @@ function createBookmarkCard(bookmark) {
   card.appendChild(header);
 
   bookmarkPlayVideoBtn.addEventListener('click', () => {
-    chrome.tabs.create({ url: `${bookmark.url}&t=${bookmark.timestamp}` });
+    chrome.tabs.create({ url: `${bookmark.url}&t=${bookmark.timestamp}`});
   });
 
 

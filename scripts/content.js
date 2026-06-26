@@ -458,7 +458,7 @@ function init() {
             }).replace(/am|pm/i, (match) => match.toUpperCase()),
           };
 
-        bookmarks.push(newBookmark);
+        bookmarks.unshift(newBookmark);
         await setStorage({ bookmarks });
         bookmarkModal.remove();
       } catch(error) {
@@ -495,6 +495,7 @@ function init() {
         document.addEventListener("click", closeModal, true);
       }, 0);
   }
+  
   
  document.addEventListener('keydown', (e) => {
     if (
