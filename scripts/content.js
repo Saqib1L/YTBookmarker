@@ -212,7 +212,7 @@ overflow-y: auto;
 function setupTooltip(addBookmarkButton) {
   const tooltip = document.createElement('div');
   tooltip.className = 'yt-bookmarker-tooltip';
-  tooltip.textContent = 'Add Bookmark';
+  tooltip.textContent = 'Add Bookmark (A)';
   document.querySelector('.html5-video-player').appendChild(tooltip);
 
   addBookmarkButton.addEventListener('mouseenter', () => {
@@ -278,9 +278,10 @@ function init() {
         return;
       }
 
-      const channelName = document.querySelector('#attributed-channel-name')?.textContent?.trim() || 
-      document.querySelector("#channel-name a")?.textContent?.trim() || 
-      "Unknown Channel";
+      const channelName = 
+        document.querySelector("ytd-watch-metadata #channel-name a")?.textContent?.trim() || 
+        document.querySelector("ytd-video-owner-renderer #channel-name a")?.textContent?.trim() || 
+        "Unknown Channel";
       
       const videoData = {
         videoTitle: document.querySelector("h1.ytd-watch-metadata yt-formatted-string")?.textContent || "Untitled Video",
