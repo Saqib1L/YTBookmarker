@@ -1,7 +1,7 @@
 import { getStorage, setStorage } from "./storage.js";
 
 const SIDEBAR_MAX_WIDTH = 190;
-const SIDEBAR_DEFAULT_WIDTH = 140;
+const SIDEBAR_DEFAULT_WIDTH = 110;
 const SIDEBAR_SNAP_THRESHOLD = 80;
 
 let isResizing = false;
