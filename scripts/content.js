@@ -375,9 +375,9 @@ function init() {
         bookmarkDropdownList.innerHTML = '';
 
         const categories = result.categories || [];
-        categories.forEach((category) => {
-          if (category === "All") return;
+        if (!categories.includes("All")) categories.unshift("All");
 
+        categories.forEach((category) => {
           const option = document.createElement('div');
           option.className = 'bookmark-dropdown-option';
           if (category === selectedCategory) option.classList.add('selected');
