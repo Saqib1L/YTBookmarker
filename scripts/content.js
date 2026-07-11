@@ -278,9 +278,10 @@ function init() {
         return;
       }
 
-      const channelName = 
-        document.querySelector("ytd-watch-metadata #channel-name a")?.textContent?.trim() || 
-        document.querySelector("ytd-video-owner-renderer #channel-name a")?.textContent?.trim() || 
+      const channelName =
+        document.querySelector("ytd-watch-metadata #attributed-channel-name")?.textContent?.trim() ||
+        document.querySelector("ytd-watch-metadata #channel-name a")?.textContent?.trim() ||
+        document.querySelector("ytd-video-owner-renderer #channel-name a")?.textContent?.trim() ||
         "Unknown Channel";
       
       const videoData = {
