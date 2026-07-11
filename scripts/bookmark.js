@@ -1,18 +1,20 @@
 import { getStorage, setStorage } from "./storage.js";
-import { getActiveCategory } from "./state.js";
+import { getActiveCategoryId } from "./state.js";
 
-function filterBookmarksByCategory(bookmarks, category) {
-  return category === 'All' ? bookmarks : bookmarks.filter((b) => b.category === category);
+function filterBookmarksByCategory(bookmarks, categoryId) {
+  return categoryId === 'all' ? bookmarks : bookmarks.filter((b) => b.categoryId === categoryId);
 }
 
 export async function searchBookmarks(query) {
   try {
-    const result = await getStorage('bookmarks');
-    const category = getActiveCategory();
-    const bookmarks = result.bookmarks || [];
-    const categoryFiltered = filterBookmarksByCategory(bookmarks, category);
+    const bookmarksResult = await getStorage('bookmarks');
+    const categoriesResult = await getStorage('categories');
+    const activeCategoryId = getActiveCategoryId();
+    const bookmarks = bookmarksResult.bookmarks || [];
+    const categories = categoriesResult.categories || [];
+    const categoryFiltered = filterBookmarksByCategory(bookmarks, activeCategoryId);
     const filteredFromSearch = categoryFiltered.filter((b) => b.customName.toLowerCase().includes(query.toLowerCase()));
-    renderBookmarks(filteredFromSearch);
+    renderBookmarks(filteredFromSearch, categories);
   } catch(error) {
     console.error('Failed to search bookmarks:', error);
   }
@@ -44,7 +46,7 @@ function formatTimestamp(seconds) {
   return `${m}:${String(s).padStart(2, '0')}`;
 }
 
-function createBookmarkCard(bookmark) {
+function createBookmarkCard(bookmark, categories) {
   // --- Build card UI ---
   const card = document.createElement('div');
   card.className = 'bookmark-card';
@@ -92,15 +94,17 @@ function createBookmarkCard(bookmark) {
   bookmarkActions.appendChild(bookmarkRenameButton);
   bookmarkActions.appendChild(bookmarkDeleteButton);
 
+  const category = categories.find((c) => c.id === bookmark.categoryId);
+  const categoryName = category ? category.name : 'All';
+
   detailsDiv.appendChild(createDetailRow('Title: ', bookmark.youtubeTitle, true));
   detailsDiv.appendChild(createDetailRow('Channel: ', bookmark.channel));
   detailsDiv.appendChild(createDetailRow('Timestamp: ', formatTimestamp(bookmark.timestamp)));
   detailsDiv.appendChild(createDetailRow('Saved: ', bookmark.savedAt));
-  detailsDiv.appendChild(createDetailRow('Category: ', bookmark.category));
+  detailsDiv.appendChild(createDetailRow('Category: ', categoryName));
   detailsDiv.appendChild(bookmarkActions);
 
   card.appendChild(detailsDiv);
-
 
   // --- Details toggle ---
   bookmarkDetailsToggleBtn.addEventListener('click', () => {
@@ -125,9 +129,9 @@ function createBookmarkCard(bookmark) {
         
           await setStorage({ bookmarks: updatedBookmarks });
 
-          const category = getActiveCategory();
-          const filtered = filterBookmarksByCategory(updatedBookmarks, category);
-          renderBookmarks(filtered);
+          const activeCategoryId = getActiveCategoryId();
+          const filtered = filterBookmarksByCategory(updatedBookmarks, activeCategoryId);
+          renderBookmarks(filtered, categories);
 
           document.getElementById('delete-confirmation-overlay').classList.remove('visible');
         } catch(error) {
@@ -167,10 +171,10 @@ function createBookmarkCard(bookmark) {
       
       await setStorage({ bookmarks });
 
-      const category = getActiveCategory();
-      const filtered = filterBookmarksByCategory(bookmarks, category);
+      const activeCategoryId = getActiveCategoryId();
+      const filtered = filterBookmarksByCategory(bookmarks, activeCategoryId);
       
-      renderBookmarks(filtered);
+      renderBookmarks(filtered, categories);
     } catch(error) {
       console.error('Failed to rename bookmark:', error);
     }
@@ -202,46 +206,55 @@ function createBookmarkCard(bookmark) {
   return card;
 }
 
-export function renderBookmarks(bookmarks) {
+export function renderBookmarks(bookmarks, categories) {
   const bookmarkList = document.getElementById('bookmarks-list');
   bookmarkList.innerHTML = '';
 
   bookmarks.forEach((bookmark) => {
-    const card = createBookmarkCard(bookmark);
+    const card = createBookmarkCard(bookmark, categories);
     bookmarkList.appendChild(card);
   });
 }
 
-export async function renderFilteredBookmarks(category) {
+export async function renderFilteredBookmarks(categoryId) {
   try {
-    const result = await getStorage('bookmarks');
-    const bookmarks = result.bookmarks || [];
-    const filtered = category === 'All' ? bookmarks : bookmarks.filter((b) => b.category === category);
-    renderBookmarks(filtered);
-   } catch(error) {
+    const bookmarksResult = await getStorage('bookmarks');
+    const categoriesResult = await getStorage('categories');
+    const bookmarks = bookmarksResult.bookmarks || [];
+    const categories = categoriesResult.categories || [];
+    const filtered = filterBookmarksByCategory(bookmarks, categoryId);
+    renderBookmarks(filtered, categories);
+  } catch(error) {
     console.error('Failed to render filtered bookmarks:', error);
   }
 }
 
 export async function initBookmarks() {
   try {
-    const result = await getStorage('bookmarks');
-    renderBookmarks(result.bookmarks || []);
+    const bookmarksResult = await getStorage('bookmarks');
+    const categoriesResult = await getStorage('categories');
+    renderBookmarks(bookmarksResult.bookmarks || [], categoriesResult.categories || []);
   } catch(error) {
     console.error('Failed to load bookmarks:', error);
-    renderBookmarks([]);
+    renderBookmarks([], []);
   }
 
   document.getElementById('search-input').addEventListener('input', (e) => {
     searchBookmarks(e.target.value);
   });
 
-  chrome.storage.onChanged.addListener((changes) => {
-    if (changes.bookmarks) {
-      const bookmarks = changes.bookmarks.newValue || [];
-      const category = getActiveCategory();
-      const filtered = filterBookmarksByCategory(bookmarks, category);
-      renderBookmarks(filtered);
+  chrome.storage.onChanged.addListener(async (changes) => {
+    if (changes.bookmarks || changes.categories) {
+      const bookmarksResult = changes.bookmarks
+        ? { bookmarks: changes.bookmarks.newValue || [] }
+        : await getStorage('bookmarks');
+      const categoriesResult = changes.categories
+        ? { categories: changes.categories.newValue || [] }
+        : await getStorage('categories');
+
+      const activeCategoryId = getActiveCategoryId();
+      const filtered = filterBookmarksByCategory(bookmarksResult.bookmarks || [], activeCategoryId);
+      renderBookmarks(filtered, categoriesResult.categories || []);
     }
   });
 }

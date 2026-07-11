@@ -1,9 +1,9 @@
-let activeCategory = 'All';
+let activeCategoryId = 'all';
 
-export function getActiveCategory() {
-  return activeCategory;
+export function getActiveCategoryId() {
+  return activeCategoryId;
 }
 
-export function setActiveCategory(category) {
-  activeCategory = category;
+export function setActiveCategoryId(categoryId) {
+  activeCategoryId = categoryId;
 }

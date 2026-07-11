@@ -316,7 +316,7 @@ function init() {
     categoryLabel.className = "yt-bookmarker-label";
     categoryLabel.textContent = "Category";
 
-    let selectedCategory = '';
+    let selectedCategoryId = '';
 
     const bookmarkDropdown = document.createElement('div');
     bookmarkDropdown.className = 'bookmark-dropdown';
@@ -371,39 +371,48 @@ function init() {
     // --- Category population ---
     function populateCategories() {
       if (!chrome.runtime?.id) return;
+
       chrome.storage.local.get("categories", (result) => {
         bookmarkDropdownList.innerHTML = '';
 
         const categories = result.categories || [];
-        if (!categories.includes("All")) categories.unshift("All");
+
+        if (!categories.some(c => c.id === 'all')) {
+          categories.unshift({ id: 'all', name: 'All' });
+        }
 
         categories.forEach((category) => {
           const option = document.createElement('div');
           option.className = 'bookmark-dropdown-option';
-          if (category === selectedCategory) option.classList.add('selected');
+          if (category.id === selectedCategoryId) option.classList.add('selected');
 
           const optionText = document.createElement('span');
-          optionText.textContent = category;
+          optionText.textContent = category.name;
 
           const optionCheck = document.createElement('span');
           optionCheck.textContent = '✓';
-          optionCheck.style.opacity = category === selectedCategory ? '1' : '0';
+          optionCheck.style.opacity = category.id === selectedCategoryId ? '1' : '0';
 
           option.appendChild(optionText);
           option.appendChild(optionCheck);
 
          option.addEventListener('click', () => {
-          if (selectedCategory === category) {
-            selectedCategory = '';
+          if (selectedCategoryId === category.id) {
+            selectedCategoryId = '';
             bookmarkDropdownTrigger.textContent = 'Select a category';
             bookmarkDropdownTrigger.classList.add('placeholder');
           } else {
-            selectedCategory = category;
-            bookmarkDropdownTrigger.textContent = category;
+            selectedCategoryId = category.id;
+            bookmarkDropdownTrigger.textContent = category.name;
             bookmarkDropdownTrigger.classList.remove('placeholder');
           }
+
           bookmarkDropdownTrigger.appendChild(bookmarkDropdownChevron);
           bookmarkDropdownList.classList.remove('open');
+
+          const options = bookmarkDropdownList.querySelectorAll('.bookmark-dropdown-option');
+          options.forEach(opt => opt.classList.remove('selected'));
+
           populateCategories();
         });
 
@@ -442,13 +451,13 @@ function init() {
         const bookmarks = result.bookmarks || [];
 
         const newBookmark = {
-            id: Date.now().toString(),
+            id: crypto.randomUUID(),
             customName: bookmarkCustomName.value.trim() || videoData.videoTitle,
             youtubeTitle: videoData.videoTitle,
             channel: videoData.channelName,
             url: videoData.videoUrl,
             timestamp: videoData.timestamp,
-            category: selectedCategory,
+            categoryId: selectedCategoryId || 'all',
             savedAt: new Date().toLocaleString('en-GB', { 
               day: '2-digit', 
               month: '2-digit', 
