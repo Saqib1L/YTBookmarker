@@ -126,7 +126,7 @@ export async function initSidebar() {
 
   try {
     const result = await getStorage('sidebarWidth');
-    const savedWidth = result.sidebarWidth ?? SIDEBAR_MAX_WIDTH;
+    const savedWidth = Math.min(result.sidebarWidth ?? SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MAX_WIDTH);
 
     if (savedWidth === 0) {
       sidebar.classList.add('collapsed');
