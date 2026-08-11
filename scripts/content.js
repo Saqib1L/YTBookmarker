@@ -2,7 +2,7 @@ function injectStyles() {
   const style = document.createElement("style");
   style.textContent = `
     .yt-bookmarker-tooltip {
-      position: absolute;
+      position: fixed;
       background: rgba(28, 28, 28, 0.4);
       color: #ffffff;
       font-family: 'Roboto', 'Arial', sans-serif;
@@ -216,11 +216,12 @@ function setupTooltip(addBookmarkButton) {
   document.querySelector('.html5-video-player').appendChild(tooltip);
 
   addBookmarkButton.addEventListener('mouseenter', () => {
-    const btnRect = addBookmarkButton.getBoundingClientRect();
-    const playerRect = document.querySelector('.html5-video-player').getBoundingClientRect();
-    tooltip.style.left = `${btnRect.left - playerRect.left + (btnRect.width / 2)}px`;
-    tooltip.style.top = `${btnRect.top - playerRect.top - 48}px`;
-    tooltip.style.transform = 'translateX(-50%)';
+    requestAnimationFrame(() => {
+      const btnRect = addBookmarkButton.getBoundingClientRect();
+      tooltip.style.left = `${btnRect.left + btnRect.width / 2}px`;
+      tooltip.style.top = `${btnRect.top - 48}px`;
+      tooltip.style.transform = 'translateX(-50%)';
+    });
     tooltip.classList.add('visible');
   });
 
