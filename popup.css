@@ -357,13 +357,14 @@ body.is-resizing {
    ============================================================ */
 .category-detail-menu {
   position: absolute;
-  right: 0;
-  top: 100%;
-  z-index: 100;
+  left: 0.65rem;
+  top: 0.2rem;
+  z-index: 9999;
   border-radius: 0.375rem;
   border: 1px solid;
   overflow: hidden;
-  min-width: 100px;
+  width: 80px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .popup[data-theme="light"] .category-detail-menu {
