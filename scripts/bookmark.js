@@ -110,6 +110,10 @@ function createBookmarkCard(bookmark, categories) {
   bookmarkDetailsToggleBtn.addEventListener('click', () => {
     detailsDiv.classList.toggle('expanded');
     bookmarkDetailsToggleBtn.classList.toggle('expanded');
+
+    requestAnimationFrame(() => {
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
   });
 
 
