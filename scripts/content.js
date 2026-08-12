@@ -27,9 +27,9 @@ function injectStyles() {
       bottom: 60px;
       right: 8px;
       z-index: 9999;
-      background: rgba(15, 15, 15, 0.92);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: rgba(15, 15, 15, 0.55);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
       border-radius: 12px;
       padding: 20px;
       width: 280px;
@@ -37,8 +37,8 @@ function injectStyles() {
       flex-direction: column;
       gap: 14px;
       font-family: 'Roboto', sans-serif;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
       animation: yt-bookmarker-fade-in 0.15s ease;
     }
 
@@ -143,10 +143,11 @@ function injectStyles() {
 
     .bookmark-dropdown-trigger {
       width: 100%;
-      padding: 6px 0;
+      padding: 9px 12px;
       border: none;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-      background: transparent;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
       color: #ffffff;
       font-size: 13px;
       outline: none;
@@ -155,6 +156,16 @@ function injectStyles() {
       align-items: center;
       justify-content: space-between;
       text-align: left;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .bookmark-dropdown-trigger:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .bookmark-dropdown-trigger.open {
+      background: rgba(255, 255, 255, 0.09);
+      border-color: rgba(255, 255, 255, 0.25);
     }
 
     .bookmark-dropdown-trigger.placeholder {
@@ -168,13 +179,15 @@ function injectStyles() {
       width: 100%;
       background: rgba(28, 28, 28, 0.98);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
+      border-radius: 10px;
+      padding: 4px;
       overflow: hidden;
       display: none;
       flex-direction: column;
       z-index: 99999;
       max-height: 150px;
-overflow-y: auto;
+      overflow-y: auto;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
     }
 
     .bookmark-dropdown-list.open {
@@ -182,9 +195,10 @@ overflow-y: auto;
     }
 
     .bookmark-dropdown-option {
-      padding: 8px 12px;
+      padding: 8px 10px;
+      border-radius: 6px;
       font-size: 13px;
-      color: #ffffff;
+      color: rgba(255, 255, 255, 0.85);
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -197,7 +211,21 @@ overflow-y: auto;
     }
 
     .bookmark-dropdown-option.selected {
+      background: rgba(255, 255, 255, 0.08);
       color: #FF0000;
+    }
+    
+    .bookmark-dropdown-option-label {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .bookmark-dropdown-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
     }
 
     .bookmark-dropdown-chevron {
