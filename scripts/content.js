@@ -24,27 +24,31 @@ function injectStyles() {
 
     .yt-bookmarker-modal {
       position: absolute;
-      bottom: 60px;
-      right: 8px;
+      bottom: 70px;
+      right: 10px;
       z-index: 9999;
-      background: rgba(15, 15, 15, 0.55);
-      backdrop-filter: blur(3px);
-      -webkit-backdrop-filter: blur(3px);
+      background: rgba(15, 15, 15, 1);
       border-radius: 12px;
       padding: 20px;
-      width: 280px;
+      width: 300px;
       display: flex;
       flex-direction: column;
       gap: 14px;
       font-family: 'Roboto', sans-serif;
       border: 1px solid rgba(255, 255, 255, 0.1);
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-      animation: yt-bookmarker-fade-in 0.15s ease;
+      animation: yt-bookmarker-fade-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
 
     @keyframes yt-bookmarker-fade-in {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateX(320px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
     }
 
     .yt-bookmarker-label {
@@ -244,6 +248,8 @@ function setupTooltip(addBookmarkButton) {
   document.querySelector('.html5-video-player').appendChild(tooltip);
 
   addBookmarkButton.addEventListener('mouseenter', () => {
+    if (document.querySelector('.yt-bookmarker-modal')) return;
+
     requestAnimationFrame(() => {
       const btnRect = addBookmarkButton.getBoundingClientRect();
       tooltip.style.left = `${btnRect.left + btnRect.width / 2}px`;
