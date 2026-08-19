@@ -1,6 +1,6 @@
 {
   "name": "SaveTube",
-  "description": "This extension that let's you save youtube videos at specific timestamps so you can pick up on where you left off and also be able to group saved videos by categories so all your saved videos can be well organised.",
+  "description": "An advanced version of youtube Watch Later",
   "version": "1.0",
   "manifest_version": 3,
   "action": {
