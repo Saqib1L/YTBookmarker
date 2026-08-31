@@ -1,7 +1,7 @@
 {
   "name": "SaveTube - Bookmark Youtube Videos",
   "description": "Bookmark YouTube videos at specific timestamps to resume where you left off, and organize saved videos into custom categories.",
-  "version": "1.2",
+  "version": "1.3",
   "manifest_version": 3,
   "action": {
     "default_title": "Open SaveTube",
