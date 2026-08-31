@@ -1,10 +1,10 @@
 {
-  "name": "SaveTube",
-  "description": "An advanced version of youtube Watch Later",
-  "version": "1.0",
+  "name": "SaveTube - Bookmark Youtube Videos",
+  "description": "Bookmark YouTube videos at specific timestamps to resume where you left off, and organize saved videos into custom categories.",
+  "version": "1.2",
   "manifest_version": 3,
   "action": {
-    "default_title": "Open YT Bookmarker",
+    "default_title": "Open SaveTube",
     "default_popup": "popup.html",
       "default_icon": {
         "16": "icons/logo.png",

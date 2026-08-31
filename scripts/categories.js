@@ -154,6 +154,10 @@ function createCategoryWrapper(category, categories) {
 
       const menu = createCategoryContextMenu(wrapper, categories, category);
       wrapper.appendChild(menu);
+
+      requestAnimationFrame(() => {
+        menu.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
     });
 
     wrapper.appendChild(dotsBtn);
